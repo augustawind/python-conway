@@ -3,7 +3,33 @@ from random import randint
 
 
 class ToroidalArray(MutableSequence):
-    '''An array whose indices wrap around indefinitely.'''
+    '''An array whose indices wrap around indefinitely.
+
+    This basically acts like a Python ``list`` with different behavior for
+    ``__getitem__``, ``__setitem__``, and ``__delitem__``. When these methods
+    are invoked (through object indexing syntax), indices are "wrapped" so that
+    out-of-range indices simply start at the other boundary of the list. For
+    negative indicies, this behavior is almost identical to regular lists
+    except that a negative index that moves past the beginning of the list will
+    continue to wrap around. This behavior is reversed for positive,
+    out-of-range indicies.
+
+    Things that work like regular Python ``lists``: membership testing with
+    ``in``, iteration, ``sorted`` and ``reversed`` protocols, addition with
+    ``+``, repetition with ``*``, ``list`` methods (``insert``, ``append``,
+    ``extend``, ``pop``, ``remove``, ``count``).
+
+    Note: Support for slicing is not implemented at this time.
+
+    Args:
+        seq (Sequence): A sequence object. Defaults to ``[]``.
+        recursive (Optional[bool]): ``True`` if you want to convert any
+            sub-sequences in ``seq`` to ``ToroidalArray``s. Defaults to
+            ``False``.
+        depth (Optional[int]): If ``recursive`` is ``True``, the maximum depth
+            at which to recursively convert sequences to ``ToroidalArray``s.
+            Defaults to ``-1``, which means no limit is set.
+    '''
 
     def __init__(self, seq=[], recursive=False, depth=-1):
         if recursive:
@@ -64,14 +90,12 @@ def step(grid):
     '''Apply the rules of the Game of Life to a grid of living and dead cells.
 
     Arguments:
-        grid: ToroidalArray
-            A grid of 1's and 0's representing living and dead cells,
-            respectively.
+        grid (ToroidalArray): A grid of 1's and 0's representing living and
+            dead cells, respectively.
 
     Returns:
-        ToroidalArray
-            A new grid holding the results of one application of the rules
-            of the Game of Life.
+        ToroidalArray: A new grid holding the results of one application of the
+            rules of the Game of Life.
     '''
     # List of (x, y) directions: (1, 1), (0, 1), (-1, 1), etc.
     dirs = [(x, y) for x in range(-1, 2) for y in range(-1, 2)
