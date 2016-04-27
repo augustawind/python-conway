@@ -1,11 +1,16 @@
-from collections.abc import MutableSequence
+from collections.abc import MutableSequence, Sequence
 from random import randint
 
 
 class ToroidalArray(MutableSequence):
     '''An array whose indices wrap around indefinitely.'''
 
-    def __init__(self, seq=[]):
+    def __init__(self, seq=[], recursive=False, depth=-1):
+        if recursive:
+            for i, item in enumerate(seq):
+                if depth and isinstance(item, Sequence):
+                    seq[i] = ToroidalArray(item, True, depth - 1)
+
         self._list = list(seq)
 
     def __str__(self):
