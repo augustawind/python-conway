@@ -1,5 +1,6 @@
 from collections.abc import MutableSequence, Sequence
 from random import randint
+import time
 
 
 class ToroidalArray(MutableSequence):
@@ -124,17 +125,21 @@ def step(grid):
 
     return grid2
 
-if __name__ == '__main__':
-    width = 10
-    height = 10
+def console_run():
+    width = 80
+    height = 40
+    delay = 0.1
     grid = ToroidalArray([ToroidalArray([randint(0, 1) for x in range(width)])
                           for y in range(height)])
 
-    done = False
-    while not done:
+    while True:
+        print('\n' * 3)
         for row in grid:
             for cell in row:
-                print(cell, end='')
+                print('*' if cell else ' ', end='')
             print()
-        done = input()
+        time.sleep(delay)
         grid = step(grid)
+
+if __name__ == '__main__':
+    console_run()
