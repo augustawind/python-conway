@@ -90,7 +90,7 @@ dirs = [(x, y) for x in range(-1, 2) for y in range(-1, 2)
         if x != 0 or y != 0]
 
 
-def step(grid):
+def step(grid1, grid2):
     '''Apply the rules of the Game of Life to a grid of living and dead cells.
 
     Arguments:
@@ -101,23 +101,19 @@ def step(grid):
         ToroidalArray: A new grid holding the results of one application of the
             rules of the Game of Life.
     '''
-    # Results grid.
-    grid2 = ToroidalArray()
-
-    for y, row in enumerate(grid):
-        grid2.append(ToroidalArray())
+    for y, row in enumerate(grid1):
         for x, cell in enumerate(row):
             # Count live neighbors of current cell.
-            live_neighbors = sum([grid[y + j][x + i] for i, j in dirs])
+            live_neighbors = sum([grid1[y + j][x + i] for i, j in dirs])
 
             # If cell has less than 2 or more than 3 live neighbors, it's dead.
             if live_neighbors < 2 or live_neighbors > 3:
-                grid2[y].append(0)
+                grid2[y][x] = 0
             # If cell has exactly 3 live neighbors, it's alive.
             elif live_neighbors == 3:
-                grid2[y].append(1)
+                grid2[y][x] = 1
             # Otherwise, it stays the same.
             else:
-                grid2[y].append(grid[y][x])
+                grid2[y][x] = grid1[y][x]
 
     return grid2

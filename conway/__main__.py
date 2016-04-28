@@ -2,6 +2,7 @@ import argparse
 import random
 import sys
 import time
+from itertools import cycle
 
 from conway import ToroidalArray, step
 
@@ -31,18 +32,19 @@ def run():
 
     args = parser.parse_args()
 
-    grid = ToroidalArray([[random.randint(0, 1) for x in range(args.width)]
-                          for y in range(args.height)], recursive=True)
-
-    show_grid(grid, args.outfile)
+    grid1 = ToroidalArray([[random.randint(0, 1) for x in range(args.width)]
+                           for y in range(args.height)], recursive=True)
+    grid2 = ToroidalArray([[0] * args.width] * args.height, recursive=True)
+    gridswap = cycle(((grid1, grid2), (grid2, grid1)))
 
     while args.turns:
+        time.sleep(args.delay)
         print(args.separator, file=args.outfile)
 
-        show_grid(grid, args.outfile)
+        grid1, grid2 = next(gridswap)
+        show_grid(grid1, args.outfile)
+        step(grid1, grid2)
 
-        time.sleep(args.delay)
-        grid = step(grid)
         args.turns -= 1
 
 
