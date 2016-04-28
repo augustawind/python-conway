@@ -110,11 +110,10 @@ def step(grid):
             # Count live neighbors of current cell.
             live_neighbors = sum([grid[y + j][x + i] for i, j in dirs])
 
-            # If cell lives has less than 2 or more than 3 live neighbors, it
-            # dies.
-            if cell and (live_neighbors < 2 or live_neighbors > 3):
+            # If cell has less than 2 or more than 3 live neighbors, it's dead.
+            if live_neighbors < 2 or live_neighbors > 3:
                 grid2[y].append(0)
-            # If cell is dead and has exactly 3 live neighbors, it lives.
+            # If cell has exactly 3 live neighbors, it's alive.
             elif live_neighbors == 3:
                 grid2[y].append(1)
             # Otherwise, it stays the same.
