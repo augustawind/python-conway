@@ -87,6 +87,11 @@ class ToroidalArray(MutableSequence):
         return ToroidalArray(self._list * n)
 
 
+# List of (x, y) directions: (1, 1), (0, 1), (-1, 1), etc.
+dirs = [(x, y) for x in range(-1, 2) for y in range(-1, 2)
+        if x != 0 or y != 0]
+
+
 def step(grid):
     '''Apply the rules of the Game of Life to a grid of living and dead cells.
 
@@ -98,10 +103,6 @@ def step(grid):
         ToroidalArray: A new grid holding the results of one application of the
             rules of the Game of Life.
     '''
-    # List of (x, y) directions: (1, 1), (0, 1), (-1, 1), etc.
-    dirs = [(x, y) for x in range(-1, 2) for y in range(-1, 2)
-            if x != 0 or y != 0]
-
     # Results grid.
     grid2 = ToroidalArray()
 
@@ -124,22 +125,3 @@ def step(grid):
                 grid2[y].append(grid[y][x])
 
     return grid2
-
-def console_run():
-    width = 80
-    height = 40
-    delay = 0.1
-    grid = ToroidalArray([ToroidalArray([randint(0, 1) for x in range(width)])
-                          for y in range(height)])
-
-    while True:
-        print('\n' * 3)
-        for row in grid:
-            for cell in row:
-                print('*' if cell else ' ', end='')
-            print()
-        time.sleep(delay)
-        grid = step(grid)
-
-if __name__ == '__main__':
-    console_run()
