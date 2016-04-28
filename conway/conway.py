@@ -90,7 +90,7 @@ dirs = {(x, y) for x in range(-1, 2) for y in range(-1, 2)
         if x != 0 or y != 0}
 
 
-def step(grid1, grid2):
+def nextgen(grid1, grid2):
     '''Apply the rules of the Game of Life to a grid of living and dead cells.
 
     Arguments:

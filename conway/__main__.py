@@ -4,7 +4,7 @@ import sys
 import time
 from itertools import cycle
 
-from conway import ToroidalArray, step
+from conway import ToroidalArray, nextgen
 
 
 def run():
@@ -43,7 +43,7 @@ def run():
 
         grid1, grid2 = next(gridswap)
         show_grid(grid1, args.outfile)
-        step(grid1, grid2)
+        nextgen(grid1, grid2)
 
         args.turns -= 1
 
