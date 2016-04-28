@@ -94,12 +94,12 @@ def step(grid1, grid2):
     '''Apply the rules of the Game of Life to a grid of living and dead cells.
 
     Arguments:
-        grid (ToroidalArray): A grid of 1's and 0's representing living and
+        grid1 (ToroidalArray): A grid of 1's and 0's representing living and
             dead cells, respectively.
-
-    Returns:
-        ToroidalArray: A new grid holding the results of one application of the
-            rules of the Game of Life.
+        grid2 (ToroidalArray): Results grid. Contents don't matter, as they
+            will all be replaced, but must be the same size as ``grid1``.
+            This grid will be populated with the results of one application
+            of the rules of the Game of Life.
     '''
     for y, row in enumerate(grid1):
         for x, cell in enumerate(row):
