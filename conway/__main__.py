@@ -7,7 +7,8 @@ from conway import ToroidalArray, step
 
 
 def run():
-    parser = argparse.ArgumentParser(description="Run Conway's Game of Life")
+    parser = argparse.ArgumentParser(description="Run Conway's Game of Life "
+                                     "cellular automata simulation.")
 
     parser.add_argument('width', type=int, help='the width of the grid')
     parser.add_argument('height', type=int, help='the height of the grid')
