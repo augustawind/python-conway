@@ -1,6 +1,4 @@
 from collections.abc import MutableSequence, Sequence
-from random import randint
-import time
 
 
 class ToroidalArray(MutableSequence):
