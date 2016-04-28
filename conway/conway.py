@@ -108,8 +108,7 @@ def step(grid):
         grid2.append(ToroidalArray())
         for x, cell in enumerate(row):
             # Count live neighbors of current cell.
-            live_neighbors = len([grid[y + j][x + i] for i, j in dirs
-                                  if grid[y + j][x + i]])
+            live_neighbors = sum([grid[y + j][x + i] for i, j in dirs])
 
             # If cell lives has less than 2 or more than 3 live neighbors, it
             # dies.
