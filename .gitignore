@@ -7,3 +7,5 @@ build
 *.egg*
 __pycache__
 .cache
+/.idea/
+/.vscode/
