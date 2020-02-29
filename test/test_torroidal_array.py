@@ -1,11 +1,8 @@
 from conway import ToroidalArray
 
+
 def test_torroidal_init_recursive():
-    t = ToroidalArray([
-        [0, 0, 0],
-        [0, 1, 1],
-        [0, 0, 0]
-    ], recursive=True)
+    t = ToroidalArray([[0, 0, 0], [0, 1, 1], [0, 0, 0]], recursive=True)
 
     assert isinstance(t, ToroidalArray)
     assert isinstance(t[0], ToroidalArray)
@@ -16,6 +13,7 @@ def test_torroidal_init_recursive():
     assert isinstance(t, ToroidalArray)
     assert isinstance(t[0], ToroidalArray)
     assert not isinstance(t[0][0], ToroidalArray)
+
 
 def test_torroidal_getitem():
     t = ToroidalArray([1, 2, 3])
@@ -44,6 +42,7 @@ def test_torroidal_getitem():
     assert t[-8] == 2
     assert t[-9] == 1
 
+
 def test_toroidal_setitem():
     t = ToroidalArray([1, 2, 3])
     t[1] = 4
@@ -64,6 +63,7 @@ def test_toroidal_setitem():
     t = ToroidalArray([1, 2, 3])
     t[6] = 4
     assert t[0] == 4
+
 
 def test_toroidal_delitem():
     t = ToroidalArray([1, 2, 3])

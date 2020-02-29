@@ -2,12 +2,8 @@ from conway import ToroidalArray, nextgen
 
 
 def test_rule_1():
-    '''Any live cell with fewer than 2 live neighbors dies.'''
-    t = ToroidalArray([
-        [0, 0, 0],
-        [0, 1, 1],
-        [0, 0, 0]
-    ], recursive=True)
+    """Any live cell with fewer than 2 live neighbors dies."""
+    t = ToroidalArray([[0, 0, 0], [0, 1, 1], [0, 0, 0]], recursive=True)
     t2 = ToroidalArray([[1] * 3] * 3, recursive=True)
 
     nextgen(t, t2)
@@ -15,12 +11,8 @@ def test_rule_1():
 
 
 def test_rule_2():
-    '''Any live cell with 2 or 3 neighbors lives on.'''
-    t = ToroidalArray([
-        [0, 1, 0],
-        [0, 1, 1],
-        [0, 0, 0]
-    ], recursive=True)
+    """Any live cell with 2 or 3 neighbors lives on."""
+    t = ToroidalArray([[0, 1, 0], [0, 1, 1], [0, 0, 0]], recursive=True)
     t2 = ToroidalArray([[0] * 3] * 3, recursive=True)
 
     nextgen(t, t2)
@@ -30,13 +22,11 @@ def test_rule_2():
 
 
 def test_rule_3():
-    '''Any live cell with more than 3 live neighbors dies.'''
-    t = ToroidalArray([
-        [0, 0, 0, 0],
-        [0, 1, 1, 0],
-        [0, 1, 1, 1],
-        [0, 0, 0, 0]
-    ], recursive=True)
+    """Any live cell with more than 3 live neighbors dies."""
+    t = ToroidalArray(
+        [[0, 0, 0, 0], [0, 1, 1, 0], [0, 1, 1, 1], [0, 0, 0, 0]],
+        recursive=True,
+    )
     t2 = ToroidalArray([[1] * 4] * 4, recursive=True)
 
     nextgen(t, t2)
@@ -45,12 +35,8 @@ def test_rule_3():
 
 
 def test_rule_4():
-    '''Any dead cell with exactly three live neighbors becomees a live cell.'''
-    t = ToroidalArray([
-        [0, 0, 0],
-        [0, 0, 1],
-        [0, 1, 1],
-    ], recursive=True)
+    """Any dead cell with exactly three live neighbors becomees a live cell."""
+    t = ToroidalArray([[0, 0, 0], [0, 0, 1], [0, 1, 1],], recursive=True)
     t2 = ToroidalArray([[0] * 3] * 3, recursive=True)
 
     nextgen(t, t2)

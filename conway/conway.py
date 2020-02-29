@@ -2,7 +2,7 @@ from collections.abc import MutableSequence, Sequence
 
 
 class ToroidalArray(MutableSequence):
-    '''An array whose indices wrap around indefinitely.
+    """An array whose indices wrap around indefinitely.
 
     This basically acts like a Python ``list`` with different behavior for
     ``__getitem__``, ``__setitem__``, and ``__delitem__``. When these methods
@@ -28,7 +28,7 @@ class ToroidalArray(MutableSequence):
         depth (Optional[int]): If ``recursive`` is ``True``, the maximum depth
             at which to recursively convert sequences to ``ToroidalArray``s.
             Defaults to ``-1``, which means no limit is set.
-    '''
+    """
 
     def __init__(self, seq=[], recursive=False, depth=-1):
         if recursive:
@@ -39,16 +39,16 @@ class ToroidalArray(MutableSequence):
         self._list = list(seq)
 
     def __str__(self):
-        return '{}({!s})'.format(self.__class__.__name__, self._list)
+        return "{}({!s})".format(self.__class__.__name__, self._list)
 
     def __repr__(self):
-        return '{}({!r})'.format(self.__class__.__name__, self._list)
+        return "{}({!r})".format(self.__class__.__name__, self._list)
 
     def __len__(self):
         return len(self._list)
 
     def _wrapped_index(self, index):
-        '''Return a regular (wrapped) index given an out of range index.'''
+        """Return a regular (wrapped) index given an out of range index."""
         wrapped = -index % len(self)
         return len(self) - wrapped if wrapped else 0
 
@@ -86,12 +86,11 @@ class ToroidalArray(MutableSequence):
 
 
 # List of (x, y) directions: (1, 1), (0, 1), (-1, 1), etc.
-dirs = {(x, y) for x in range(-1, 2) for y in range(-1, 2)
-        if x != 0 or y != 0}
+dirs = {(x, y) for x in range(-1, 2) for y in range(-1, 2) if x != 0 or y != 0}
 
 
 def nextgen(grid1, grid2):
-    '''Apply the rules of the Game of Life to a grid of living and dead cells.
+    """Apply the rules of the Game of Life to a grid of living and dead cells.
 
     Arguments:
         grid1 (ToroidalArray): A grid of 1's and 0's representing living and
@@ -100,9 +99,9 @@ def nextgen(grid1, grid2):
             will all be replaced, but must be the same size as ``grid1``.
             This grid will be populated with the results of one application
             of the rules of the Game of Life.
-    '''
+    """
     for y, row in enumerate(grid1):
-        for x, cell in enumerate(row):
+        for x in range(len(row)):
             # Count live neighbors of current cell.
             live_neighbors = sum([grid1[y + j][x + i] for i, j in dirs])
 

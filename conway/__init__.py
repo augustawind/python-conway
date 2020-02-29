@@ -1,1 +1,1 @@
-from .conway import nextgen, ToroidalArray
+from .conway import ToroidalArray, nextgen
