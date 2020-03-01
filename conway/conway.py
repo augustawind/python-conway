@@ -1,4 +1,4 @@
-from collections.abc import MutableSequence, Sequence
+from collections.abc import Iterable, MutableSequence
 
 
 class ToroidalArray(MutableSequence):
@@ -21,22 +21,23 @@ class ToroidalArray(MutableSequence):
     Note: Support for slicing is not implemented at this time.
 
     Args:
-        seq (Sequence): A sequence object. Defaults to ``[]``.
-        recursive (Optional[bool]): ``True`` if you want to convert any
-            sub-sequences in ``seq`` to ``ToroidalArray``s. Defaults to
-            ``False``.
-        depth (Optional[int]): If ``recursive`` is ``True``, the maximum depth
-            at which to recursively convert sequences to ``ToroidalArray``s.
-            Defaults to ``-1``, which means no limit is set.
+        seq: An iterable whose items will populate the TorroidalArray.
+        recursive: Whether to convert any nested iterables in ``seq`` to
+            ToroidalArrays. This will not convert ``str`` or ``bytes`` objects.
+        depth: Maximum depth to traverse if ``recursive=True``. Use a
+            negative number for no limit (the default).
     """
 
-    def __init__(self, seq=[], recursive=False, depth=-1):
-        if recursive:
-            for i, item in enumerate(seq):
-                if depth and isinstance(item, Sequence):
-                    seq[i] = ToroidalArray(item, True, depth - 1)
-
+    def __init__(
+        self, seq: Iterable = (), recursive: bool = False, depth: int = -1
+    ):
         self._list = list(seq)
+        if recursive and depth:
+            for i, item in enumerate(self._list):
+                if not isinstance(item, (str, bytes)) and isinstance(
+                    item, Iterable
+                ):
+                    self._list[i] = ToroidalArray(item, True, depth - 1)
 
     def __str__(self):
         return "{}({!s})".format(self.__class__.__name__, self._list)
@@ -50,7 +51,9 @@ class ToroidalArray(MutableSequence):
     def _wrapped_index(self, index):
         """Return a regular (wrapped) index given an out of range index."""
         wrapped = -index % len(self)
-        return len(self) - wrapped if wrapped else 0
+        if wrapped:
+            return len(self) - wrapped
+        return 0
 
     def __getitem__(self, index):
         idx = self._wrapped_index(index)
@@ -85,11 +88,11 @@ class ToroidalArray(MutableSequence):
         return ToroidalArray(self._list * n)
 
 
-# List of (x, y) directions: (1, 1), (0, 1), (-1, 1), etc.
-dirs = {(x, y) for x in range(-1, 2) for y in range(-1, 2) if x != 0 or y != 0}
+# List of 8 (x, y) directions.
+dirs = {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)}
 
 
-def nextgen(grid1, grid2):
+def nextgen(grid1: ToroidalArray, grid2: ToroidalArray):
     """Apply the rules of the Game of Life to a grid of living and dead cells.
 
     Arguments:
