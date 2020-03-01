@@ -9,8 +9,8 @@ from conway import ToroidalArray, nextgen
 
 def run():
     parser = argparse.ArgumentParser(
-        description="Run Conway's Game of Life "
-        "cellular automata simulation."
+        prog="conway",
+        description="Conway's Game of Life, a cellular automata simulation.",
     )
 
     parser.add_argument("width", type=int, help="the width of the grid")
@@ -21,7 +21,7 @@ def run():
         "--turns",
         type=int,
         default="-1",
-        help="number of turns to play" " (default %(default)s, forever)",
+        help="number of turns to play (default: forever)",
     )
 
     parser.add_argument(
@@ -29,16 +29,19 @@ def run():
         "--delay",
         type=float,
         default="0.1",
-        help="delay between turns, in seconds" " (default %(default)s)",
+        help="delay between turns, in seconds (default: %(default)s)",
     )
 
     parser.add_argument(
         "-s",
         "--separator",
         type=str,
-        default="\n%\n",
-        help="text separator between output of each turn"
-        " (default '\\n%(default)s\\n')",
+        default="+N---+N",
+        help="text separator between output of each turn; the character"
+        " sequence `+N` denotes a newline (default: %(default)s')",
+    )
+    parser.add_argument(
+        "-p", "--padding", type=int, default=2,
     )
 
     parser.add_argument(
@@ -46,10 +49,12 @@ def run():
         "--outfile",
         type=argparse.FileType("w"),
         default=sys.stdout,
-        help="output destination (default: stdout)",
+        help="output destination (default: %(default)s)",
     )
 
     args = parser.parse_args()
+
+    args.separator = args.separator.replace("+N", "\n")
 
     grid1 = ToroidalArray(
         [
