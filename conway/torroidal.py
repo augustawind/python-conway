@@ -1,4 +1,7 @@
-from collections.abc import Iterable, MutableSequence
+import random
+from collections.abc import MutableSequence
+from dataclasses import dataclass, field
+from typing import Any, Iterable, NamedTuple
 
 
 class ToroidalArray(MutableSequence):
@@ -88,34 +91,96 @@ class ToroidalArray(MutableSequence):
         return ToroidalArray(self._list * n)
 
 
+class Point(NamedTuple):
+    x: int
+    y: int
+
+    def __add__(self, rhs: "Point") -> "Point":
+        return Point(self.x + rhs.x, self.y + rhs.y)
+
+
+@dataclass
+class Grid:
+    width: int
+    height: int
+    cells: ToroidalArray = field(default=None)
+
+    def __post_init__(self):
+        if self.cells is None:
+            self.cells = ToroidalArray(
+                [[0] * self.width] * self.height, recursive=True, depth=1
+            )
+
+    @staticmethod
+    def from_seq(seq: Iterable[Iterable[Any]]) -> "Grid":
+        width = max(len(row) for row in seq)
+        height = len(seq)
+        cells = []
+        for row in seq:
+            new_row = [bool(cell) for cell in row]
+            padding = min(0, width - len(new_row))
+            new_row.extend([False] * padding)
+            cells.append(new_row)
+        return Grid(
+            width=width,
+            height=height,
+            cells=ToroidalArray(cells, recursive=True, depth=1),
+        )
+
+    def randomize(self, k=0.5):
+        for y in range(self.height):
+            for x in range(self.width):
+                self.cells[y][x] = int(random.random() < k)
+
+    def __getitem__(self, point: Point) -> bool:
+        return self.cells[point.y][point.x]
+
+    def __setitem__(self, point: Point, value: bool):
+        self.cells[point.y][point.x] = value
+
+
 # List of 8 (x, y) directions.
-dirs = {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)}
+dirs = {
+    Point(x, y)
+    for x, y in (
+        (-1, -1),
+        (-1, 0),
+        (-1, 1),
+        (0, -1),
+        (0, 1),
+        (1, -1),
+        (1, 0),
+        (1, 1),
+    )
+}
 
 
-def nextgen(grid1: ToroidalArray, grid2: ToroidalArray):
+def nextgen(grid1: Grid, grid2: Grid) -> Grid:
     """Apply the rules of the Game of Life to a grid of living and dead cells.
 
     Arguments:
-        grid1 (ToroidalArray): A grid of 1's and 0's representing living and
+        grid1 (Grid): A grid of 1's and 0's representing living and
             dead cells, respectively.
-        grid2 (ToroidalArray): Results grid. Contents don't matter, as they
+        grid2 (Grid): Results grid. Contents don't matter, as they
             will all be replaced, but must be the same size as ``grid1``.
             This grid will be populated with the results of one application
             of the rules of the Game of Life.
     """
-    for y, row in enumerate(grid1):
+    for y, row in enumerate(grid1.cells):
         for x in range(len(row)):
+            p = Point(x, y)
+
             # Count live neighbors of current cell.
-            live_neighbors = sum([grid1[y + j][x + i] for i, j in dirs])
+            live_neighbors = sum(grid1[p + d] for d in dirs)
 
             # If cell has less than 2 or more than 3 live neighbors, it's dead.
             if live_neighbors < 2 or live_neighbors > 3:
-                grid2[y][x] = 0
+                grid2[p] = 0
             # If cell has exactly 3 live neighbors, it's alive.
             elif live_neighbors == 3:
-                grid2[y][x] = 1
+                grid2[p] = 1
             # Otherwise, it stays the same.
             else:
-                grid2[y][x] = grid1[y][x]
+                grid2[p] = grid1[p]
 
     return grid2

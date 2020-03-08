@@ -4,7 +4,7 @@ import sys
 import time
 from itertools import cycle
 
-from conway.torroidal import ToroidalArray, nextgen
+from conway.torroidal import Grid, nextgen
 
 
 def run():
@@ -56,14 +56,9 @@ def run():
 
     args.separator = args.separator.replace("+N", "\n")
 
-    grid1 = ToroidalArray(
-        [
-            [random.randint(0, 1) for x in range(args.width)]
-            for y in range(args.height)
-        ],
-        recursive=True,
-    )
-    grid2 = ToroidalArray([[0] * args.width] * args.height, recursive=True)
+    grid1 = Grid(args.width, args.height)
+    grid1.randomize()
+    grid2 = Grid(args.width, args.height)
     gridswap = cycle(((grid1, grid2), (grid2, grid1)))
 
     while args.turns:
