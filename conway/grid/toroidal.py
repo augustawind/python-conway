@@ -3,8 +3,7 @@ from collections.abc import Collection, MutableSequence
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Iterator, NamedTuple
 
-LIVE = True
-DEAD = False
+from conway.grid import DIRS, Cell, Point
 
 
 class ToroidalArray(MutableSequence):
@@ -94,14 +93,6 @@ class ToroidalArray(MutableSequence):
         return ToroidalArray(self._list * n)
 
 
-class Point(NamedTuple):
-    x: int
-    y: int
-
-    def __add__(self, rhs: "Point") -> "Point":
-        return Point(self.x + rhs.x, self.y + rhs.y)
-
-
 @dataclass
 class Grid(Collection):
     width: int = field(default=None)
@@ -119,7 +110,9 @@ class Grid(Collection):
         # If `cells` not given, create a zeroed `width` x `height` array.
         if self.cells is None:
             self.cells = ToroidalArray(
-                [[DEAD] * self.width] * self.height, recursive=True, depth=1
+                [[Cell.DEAD] * self.width] * self.height,
+                recursive=True,
+                depth=1,
             )
         # If `cells` is given, ensure it matches the given dimensions.
         else:
@@ -138,7 +131,7 @@ class Grid(Collection):
             # Add padding as needed so rows have uniform widths.
             for row in self.cells:
                 padding = min(0, max_width - len(row))
-                row.extend([DEAD] * padding)
+                row.extend([Cell.DEAD] * padding)
 
     @staticmethod
     def from_2d_seq(seq: Iterable[Iterable[Any]]) -> "Grid":
@@ -168,22 +161,6 @@ class Grid(Collection):
     __contains__ = __getitem__
 
 
-# List of 8 (x, y) directions.
-dirs = {
-    Point(x, y)
-    for x, y in (
-        (-1, -1),
-        (-1, 0),
-        (-1, 1),
-        (0, -1),
-        (0, 1),
-        (1, -1),
-        (1, 0),
-        (1, 1),
-    )
-}
-
-
 def nextgen(grid1: Grid, grid2: Grid) -> Grid:
     """Apply the rules of the Game of Life to a grid of living and dead cells.
 
@@ -200,7 +177,7 @@ def nextgen(grid1: Grid, grid2: Grid) -> Grid:
             p = Point(x, y)
 
             # Count live neighbors of current cell.
-            live_neighbors = sum(grid1[p + d] for d in dirs)
+            live_neighbors = sum(grid1[p + d] for d in DIRS)
 
             # If cell has less than 2 or more than 3 live neighbors, it's dead.
             if live_neighbors < 2 or live_neighbors > 3:

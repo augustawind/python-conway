@@ -35,7 +35,7 @@ deps:
 # Format code.
 .PHONY: fmt
 fmt:
-	pyfmt
+	pyfmt --select $(if $(SELECT),$(SELECT),$(if $(AMEND),staged,modified)) $(if $(AMEND),--commit amend --commit-msg)
 
 # Run tests.
 .PHONY: test
