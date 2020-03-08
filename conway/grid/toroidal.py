@@ -102,7 +102,7 @@ class Grid(Collection):
     swap: Iterator[Tuple[ToroidalArray, ToroidalArray]] = field(init=False)
 
     def __post_init__(self):
-        if self.width == 0 or self.height == 0:
+        if self.width <= 0 or self.height <= 0:
             raise ValueError("`width` and `height` must be greater than zero")
         if self.cells is None and not (self.width and self.height):
             raise ValueError(
