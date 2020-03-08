@@ -3,6 +3,9 @@ from collections.abc import Collection, MutableSequence
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Iterator, NamedTuple
 
+LIVE = True
+DEAD = False
+
 
 class ToroidalArray(MutableSequence):
     """An array whose indices wrap around indefinitely.
@@ -116,7 +119,7 @@ class Grid(Collection):
         # If `cells` not given, create a zeroed `width` x `height` array.
         if self.cells is None:
             self.cells = ToroidalArray(
-                [[0] * self.width] * self.height, recursive=True, depth=1
+                [[DEAD] * self.width] * self.height, recursive=True, depth=1
             )
         # If `cells` is given, ensure it matches the given dimensions.
         else:
@@ -126,26 +129,26 @@ class Grid(Collection):
                     "given `height` does not match actual height of `cells`"
                 )
 
-            width = max(len(row) for row in self.cells)
-            if self.width is not None and self.width != width:
+            max_width = max(len(row) for row in self.cells)
+            if self.width is not None and self.width < max_width:
                 raise ValueError(
                     "given `width` does not match actual width of `cells`"
                 )
 
             # Add padding as needed so rows have uniform widths.
             for row in self.cells:
-                padding = min(0, width - len(row))
-                row.extend([False] * padding)
+                padding = min(0, max_width - len(row))
+                row.extend([DEAD] * padding)
 
     @staticmethod
     def from_2d_seq(seq: Iterable[Iterable[Any]]) -> "Grid":
         cells = ((bool(cell) for cell in row) for row in seq)
-        return Grid(cells=ToroidalArray(cells, recursive=True, depth=1),)
+        return Grid(cells=ToroidalArray(cells, recursive=True, depth=1))
 
     def randomize(self, k=0.5):
         for y in range(self.height):
             for x in range(self.width):
-                self.cells[y][x] = int(random.random() < k)
+                self[Point(x, y)] = random.random() < k
 
     def __getitem__(self, cell: Point) -> bool:
         return self.cells[cell.y][cell.x]

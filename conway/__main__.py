@@ -3,11 +3,12 @@ import random
 import sys
 import time
 from itertools import cycle
+from typing import IO
 
 from conway.torroidal import Grid, nextgen
 
 
-def run():
+def main():
     parser = argparse.ArgumentParser(
         prog="conway",
         description="Conway's Game of Life, a cellular automata simulation.",
@@ -72,12 +73,12 @@ def run():
         args.turns -= 1
 
 
-def show_grid(grid, outfile):
-    for row in grid:
+def show_grid(grid: Grid, outfile: IO):
+    for row in grid.cells:
         for cell in row:
             print("*" if cell else " ", end="", file=outfile)
         print(file=outfile)
 
 
 if __name__ == "__main__":
-    run()
+    main()
