@@ -1,8 +1,7 @@
-from enum import Enum
 from typing import NamedTuple
 
 
-class Cell(Enum):
+class Cell:
     LIVE = True
     DEAD = False
 

@@ -5,7 +5,7 @@ import time
 from itertools import cycle
 from typing import IO
 
-from conway.torroidal import Grid, nextgen
+from conway.grid.toroidal import Grid
 
 
 def main():
@@ -57,18 +57,24 @@ def main():
 
     args.separator = args.separator.replace("+N", "\n")
 
-    grid1 = Grid(args.width, args.height)
-    grid1.randomize()
-    grid2 = Grid(args.width, args.height)
-    gridswap = cycle(((grid1, grid2), (grid2, grid1)))
+    grid1 = Grid.from_2d_seq(
+        [
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+        ]
+    )
+    # grid1 = Grid(args.width, args.height)
+    # grid1.randomize()
 
     while args.turns:
         time.sleep(args.delay)
         print(args.separator, file=args.outfile)
 
-        grid1, grid2 = next(gridswap)
         show_grid(grid1, args.outfile)
-        nextgen(grid1, grid2)
+        grid1.nextgen()
 
         args.turns -= 1
 
