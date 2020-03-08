@@ -1,4 +1,4 @@
-from conway import ToroidalArray, nextgen
+from conway.torroidal import ToroidalArray, nextgen
 
 
 def test_rule_1():

@@ -4,7 +4,7 @@ import sys
 import time
 from itertools import cycle
 
-from conway import ToroidalArray, nextgen
+from conway.torroidal import ToroidalArray, nextgen
 
 
 def run():
