@@ -1,5 +1,5 @@
 import random
-from collections.abc import MutableSequence
+from collections.abc import Collection, MutableSequence
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Iterator, NamedTuple
 
@@ -100,43 +100,58 @@ class Point(NamedTuple):
 
 
 @dataclass
-class Grid:
-    width: int
-    height: int
+class Grid(Collection):
+    width: int = field(default=None)
+    height: int = field(default=None)
     cells: ToroidalArray = field(default=None)
 
     def __post_init__(self):
+        if self.width == 0 or self.height == 0:
+            raise ValueError("`width` and `height` must be greater than zero")
+        if self.cells is None and not (self.width and self.height):
+            raise ValueError(
+                "one of (`width` AND `height`) OR `cells` must be set"
+            )
+
+        # If `cells` not given, create a zeroed `width` x `height` array.
         if self.cells is None:
             self.cells = ToroidalArray(
                 [[0] * self.width] * self.height, recursive=True, depth=1
             )
+        # If `cells` is given, ensure it matches the given dimensions.
+        else:
+            height = len(self.cells)
+            if self.height is not None and self.height != height:
+                raise ValueError(
+                    "given `height` does not match actual height of `cells`"
+                )
+
+            width = max(len(row) for row in self.cells)
+            if self.width is not None and self.width != width:
+                raise ValueError(
+                    "given `width` does not match actual width of `cells`"
+                )
+
+            # Add padding as needed so rows have uniform widths.
+            for row in self.cells:
+                padding = min(0, width - len(row))
+                row.extend([False] * padding)
 
     @staticmethod
-    def from_seq(seq: Iterable[Iterable[Any]]) -> "Grid":
-        width = max(len(row) for row in seq)
-        height = len(seq)
-        cells = []
-        for row in seq:
-            new_row = [bool(cell) for cell in row]
-            padding = min(0, width - len(new_row))
-            new_row.extend([False] * padding)
-            cells.append(new_row)
-        return Grid(
-            width=width,
-            height=height,
-            cells=ToroidalArray(cells, recursive=True, depth=1),
-        )
+    def from_2d_seq(seq: Iterable[Iterable[Any]]) -> "Grid":
+        cells = ((bool(cell) for cell in row) for row in seq)
+        return Grid(cells=ToroidalArray(cells, recursive=True, depth=1),)
 
     def randomize(self, k=0.5):
         for y in range(self.height):
             for x in range(self.width):
                 self.cells[y][x] = int(random.random() < k)
 
-    def __getitem__(self, point: Point) -> bool:
-        return self.cells[point.y][point.x]
+    def __getitem__(self, cell: Point) -> bool:
+        return self.cells[cell.y][cell.x]
 
-    def __setitem__(self, point: Point, value: bool):
-        self.cells[point.y][point.x] = value
+    def __setitem__(self, cell: Point, value: bool):
+        self.cells[cell.y][cell.x] = value
 
     def __iter__(self) -> Iterator[Point]:
         for y, row in enumerate(self.cells):
@@ -146,6 +161,8 @@ class Grid:
 
     def __len__(self) -> int:
         return len(tuple(iter(self)))
+
+    __contains__ = __getitem__
 
 
 # List of 8 (x, y) directions.
