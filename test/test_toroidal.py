@@ -1,4 +1,4 @@
-from conway.torroidal import ToroidalArray
+from conway.grid.toroidal import ToroidalArray
 
 
 def test_torroidal_init_recursive():

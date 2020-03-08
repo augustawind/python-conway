@@ -1,4 +1,4 @@
-from conway.torroidal import Grid, Point, nextgen
+from conway.grid.toroidal import Grid, Point, nextgen
 
 
 def test_rule_1():
