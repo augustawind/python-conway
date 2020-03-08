@@ -7,7 +7,7 @@ def test_rule_1():
     t2 = Grid.from_seq([[1] * 3] * 3)
 
     nextgen(t, t2)
-    assert all(True not in row for row in t2)
+    assert len(t2) == 0
 
 
 def test_rule_2():

@@ -1,7 +1,7 @@
 import random
 from collections.abc import MutableSequence
 from dataclasses import dataclass, field
-from typing import Any, Iterable, NamedTuple
+from typing import Any, Iterable, Iterator, NamedTuple
 
 
 class ToroidalArray(MutableSequence):
@@ -137,6 +137,15 @@ class Grid:
 
     def __setitem__(self, point: Point, value: bool):
         self.cells[point.y][point.x] = value
+
+    def __iter__(self) -> Iterator[Point]:
+        for y, row in enumerate(self.cells):
+            for x, cell in enumerate(row):
+                if cell:
+                    yield Point(x, y)
+
+    def __len__(self) -> int:
+        return len(tuple(iter(self)))
 
 
 # List of 8 (x, y) directions.
