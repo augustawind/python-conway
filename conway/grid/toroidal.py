@@ -1,10 +1,7 @@
-import random
-from collections.abc import Collection, MutableSequence
-from dataclasses import InitVar, dataclass, field
-from itertools import cycle
-from typing import Any, Iterable, Iterator, NamedTuple, Tuple
+from collections.abc import MutableSequence
+from typing import Any, Iterable, Iterator, Tuple
 
-from conway.grid import DIRS, Cell, Point
+from conway.grid import DIRS, BaseGrid, Cell, Point
 
 
 class ToroidalArray(MutableSequence):
@@ -94,49 +91,15 @@ class ToroidalArray(MutableSequence):
         return ToroidalArray(self._list * n)
 
 
-@dataclass
-class Grid(Collection):
-    width: int = None
-    height: int = None
-    cells: ToroidalArray = None
-    swap: Iterator[Tuple[ToroidalArray, ToroidalArray]] = field(init=False)
-
+class Grid(BaseGrid[ToroidalArray]):
     def __post_init__(self):
-        if self.width <= 0 or self.height <= 0:
-            raise ValueError("`width` and `height` must be greater than zero")
-        if self.cells is None and not (self.width and self.height):
-            raise ValueError(
-                "one of (`width` AND `height`) OR `cells` must be set"
-            )
+        super().__post_init__()
 
-        # If `cells` not given, create a zeroed `width` x `height` array.
-        if self.cells is None:
-            self.cells = self.mk_zeroed_cells()
-        # If `cells` is given, ensure it matches the given dimensions.
-        else:
-            height = len(self.cells)
-            if self.height is None:
-                self.height = height
-            elif self.height != height:
-                raise ValueError(
-                    "given `height` does not match actual height of `cells`"
-                )
-
-            max_width = max(len(row) for row in self.cells)
-            if self.width is None:
-                self.width = max_width
-            elif self.width != max_width:
-                raise ValueError(
-                    "given `width` does not match actual width of `cells`"
-                )
-
-            # Add padding as needed so rows have uniform widths.
-            for row in self.cells:
-                padding = min(0, max_width - len(row))
+        # Add padding as needed so rows have uniform widths.
+        for row in self.cells:
+            padding = min(0, self.width - len(row))
+            if padding:
                 row.extend([Cell.DEAD] * padding)
-
-        swap_cells = self.mk_zeroed_cells()
-        self.swap = cycle(((self.cells, swap_cells), (swap_cells, self.cells)))
 
     @staticmethod
     def from_2d_seq(seq: Iterable[Iterable[Any]]) -> "Grid":
@@ -148,54 +111,24 @@ class Grid(Collection):
             [[Cell.DEAD] * self.width] * self.height, recursive=True, depth=1,
         )
 
-    def __getitem__(self, cell: Point) -> bool:
-        return self.cells[cell.y][cell.x]
+    def get_max_width(self) -> int:
+        return max(len(row) for row in self.cells)
 
-    __contains__ = __getitem__
+    def get_max_height(self) -> int:
+        return len(self.cells)
 
-    def __setitem__(self, cell: Point, value: bool):
-        self.cells[cell.y][cell.x] = value
+    @staticmethod
+    def get_cell(cells: ToroidalArray, point: Point) -> bool:
+        return cells[point.y][point.x]
 
-    def __iter__(self) -> Iterator[Point]:
+    @staticmethod
+    def set_cell(cells: ToroidalArray, point: Point, value: bool):
+        cells[point.y][point.x] = value
+
+    def enumerate_cells(self) -> Iterator[Tuple[Point, bool]]:
         for y, row in enumerate(self.cells):
             for x, cell in enumerate(row):
-                if cell:
-                    yield Point(x, y)
+                yield Point(x, y), cell
 
-    def __len__(self) -> int:
-        return len(tuple(iter(self)))
-
-    def randomize(self, k=0.5):
-        for y in range(self.height):
-            for x in range(self.width):
-                self[Point(x, y)] = random.random() < k
-
-    def nextgen(self) -> "Grid":
-        """Apply the rules of the Game of Life to a grid of living and dead cells.
-
-        Arguments:
-            grid1 (Grid): A grid of 1's and 0's representing living and
-                dead cells, respectively.
-            grid2 (Grid): Results grid. Contents don't matter, as they
-                will all be replaced, but must be the same size as ``grid1``.
-                This grid will be populated with the results of one application
-                of the rules of the Game of Life.
-        """
-        cells, next_cells = next(self.swap)
-
-        for y, row in enumerate(cells):
-            for x in range(len(row)):
-                # Count live neighbors of current cell.
-                live_neighbors = sum(cells[y + dy][x + dx] for dx, dy in DIRS)
-
-                # If cell has less than 2 or more than 3 live neighbors, it's dead.
-                if live_neighbors < 2 or live_neighbors > 3:
-                    next_cells[y][x] = 0
-                # If cell has exactly 3 live neighbors, it's alive.
-                elif live_neighbors == 3:
-                    next_cells[y][x] = 1
-                # Otherwise, it stays the same.
-                else:
-                    next_cells[y][x] = cells[y][x]
-
-        self.cells = next_cells
+    def count_live_neighbors(self, point: Point) -> int:
+        return sum(self[point + delta] for delta in DIRS)
