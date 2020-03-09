@@ -78,8 +78,17 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
 
     @staticmethod
     @abc.abstractmethod
+    def from_seq(seq: Iterable[Any], width: int) -> "BaseGrid":
+        """Create a Grid from a flat sequence of cells.
+
+        The sequence is split up into rows by the given `width`. Height is
+        determined by counting the number of rows after the split.
+        """
+
+    @staticmethod
+    @abc.abstractmethod
     def from_2d_seq(seq: Iterable[Iterable[Any]]) -> "BaseGrid":
-        """Create a Grid from a 2-dimensional sequence.
+        """Create a Grid from a 2-dimensional sequence of cells.
         
         - It should derive width and height from the sequence's dimensions.
         - Since all Python objects have a truthiness value, it should accept
