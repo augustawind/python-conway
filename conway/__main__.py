@@ -5,6 +5,7 @@ import time
 from itertools import cycle
 from typing import IO
 
+import conway
 from conway.grid.cell_set import Grid
 
 
@@ -65,9 +66,7 @@ def main():
     args.separator *= grid.width // len(args.separator)
 
     print(str(grid), file=args.outfile)
-    while args.turns:
-        tick(grid, args)
-        args.turns -= 1
+    conway.play(grid, args.delay, args.separator, args.turns, args.outfile)
 
 
 def tick(grid: Grid, args: argparse.Namespace):
