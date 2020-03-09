@@ -1,14 +1,18 @@
+from test import GridTests
+
 import pytest
 
-from conway.grid import Cell, Point
+from conway.grid import Cell
+from conway.grid import Point as P
 from conway.grid.cell_set import Grid
 
-P = Point
 T = Cell.ALIVE
 F = Cell.DEAD
 
 
-class TestGrid:
+class TestGrid(GridTests):
+    GRID_CLS = Grid
+
     def test_init_with_width_and_height(self):
         grid = Grid(width=3, height=2)
         assert (grid.width, grid.height) == (3, 2)
