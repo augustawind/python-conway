@@ -34,8 +34,8 @@ def main():
         "--separator",
         type=str,
         default="%",
-        help="text separator between output of each turn; the character"
-        " sequence `+N` denotes a newline (default: %(default)s')",
+        help="char(s) used to separate each turn's output"
+        " (default: %(default)s)",
     )
     parser.add_argument(
         "-p", "--padding", type=int, default=2,
@@ -47,10 +47,7 @@ def main():
         default=sys.stdout,
         help="output destination (default: %(default)s)",
     )
-
     args = parser.parse_args()
-
-    args.separator = args.separator.replace("+N", "\n")
 
     grid = Grid.from_2d_seq(
         [
@@ -64,8 +61,10 @@ def main():
     # grid = Grid(args.width, args.height)
     # grid.randomize()
 
-    print(str(grid), file=args.outfile)
+    # Expand separator to a full line.
+    args.separator *= grid.width // len(args.separator)
 
+    print(str(grid), file=args.outfile)
     while args.turns:
         tick(grid, args)
         args.turns -= 1
