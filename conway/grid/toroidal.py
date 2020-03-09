@@ -1,5 +1,5 @@
 from collections.abc import MutableSequence
-from typing import Any, Iterable, Iterator, Tuple
+from typing import Any, Iterable, Iterator, Sequence, Tuple
 
 from conway.grid import DIRS, BaseGrid, Cell, Point
 
@@ -107,7 +107,7 @@ class Grid(BaseGrid[ToroidalArray]):
             row.extend(Cell.DEAD for _ in range(padding))
 
     @classmethod
-    def from_2d_seq(cls, seq: Iterable[Iterable[Any]]) -> "Grid":
+    def from_2d_seq(cls, seq: Sequence[Sequence[Any]]) -> "Grid":
         cells = ((bool(cell) for cell in row) for row in seq)
         return Grid(cells=ToroidalArray(cells, recursive=True, depth=1))
 
@@ -116,7 +116,7 @@ class Grid(BaseGrid[ToroidalArray]):
             [[Cell.DEAD] * self.width] * self.height, recursive=True, depth=1,
         )
 
-    def calculate_size(self) -> (int, int):
+    def calculate_size(self) -> Tuple[int, int]:
         width = max(len(row) for row in self.cells)
         height = len(self.cells)
         return width, height

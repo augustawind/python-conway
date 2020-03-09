@@ -1,9 +1,9 @@
-from test import GridTests
-
 import pytest
 
 from conway.grid import Cell
 from conway.grid.toroidal import Grid, ToroidalArray
+
+from . import GameRulesTestMixin
 
 T = Cell.ALIVE
 F = Cell.DEAD
@@ -101,7 +101,7 @@ def tarray(seq=()) -> ToroidalArray:
     return ToroidalArray(seq, recursive=True)
 
 
-class TestGrid(GridTests):
+class TestGrid(GameRulesTestMixin):
     GRID_CLS = Grid
 
     def test_init_with_width_and_height(self):

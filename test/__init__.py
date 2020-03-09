@@ -1,7 +1,7 @@
 from conway.grid import BaseGrid, Point
 
 
-class GridTests:
+class GameRulesTestMixin:
     GRID_CLS: BaseGrid
 
     def test_rule_1(self):
@@ -31,7 +31,7 @@ class GridTests:
         assert grid[Point(2, 2)] == 0
 
     def test_rule_4(self):
-        """Any dead cell with exactly three live neighbors becomees a live cell."""
+        """Any dead cell with exactly 3 live neighbors becomes alive."""
         grid = self.GRID_CLS.from_2d_seq([[0, 0, 0], [0, 0, 1], [0, 1, 1]])
 
         grid.nextgen()

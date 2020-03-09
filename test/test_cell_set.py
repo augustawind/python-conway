@@ -1,16 +1,16 @@
-from test import GridTests
-
 import pytest
 
 from conway.grid import Cell
 from conway.grid import Point as P
 from conway.grid.cell_set import Grid
 
+from . import GameRulesTestMixin
+
 T = Cell.ALIVE
 F = Cell.DEAD
 
 
-class TestGrid(GridTests):
+class TestGrid(GameRulesTestMixin):
     GRID_CLS = Grid
 
     def test_init_with_width_and_height(self):

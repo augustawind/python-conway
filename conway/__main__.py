@@ -5,7 +5,7 @@ import time
 from itertools import cycle
 from typing import IO
 
-from conway.grid.toroidal import Grid
+from conway.grid.cell_set import Grid
 
 
 def main():

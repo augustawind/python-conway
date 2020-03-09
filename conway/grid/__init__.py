@@ -4,7 +4,17 @@ import random
 from collections.abc import Collection
 from dataclasses import dataclass, field
 from itertools import cycle
-from typing import Any, Generic, Iterable, Iterator, NamedTuple, Tuple, TypeVar
+from typing import (
+    Any,
+    Generic,
+    Iterable,
+    Iterator,
+    NamedTuple,
+    Sequence,
+    Set,
+    Tuple,
+    TypeVar,
+)
 
 
 class Cell:
@@ -16,7 +26,7 @@ class Point(NamedTuple):
     x: int
     y: int
 
-    def __add__(self, rhs: "Point") -> "Point":
+    def __add__(self, rhs: "Point") -> "Point":  # type: ignore
         return Point(self.x + rhs.x, self.y + rhs.y)
 
 
@@ -38,11 +48,11 @@ DIRS = {
 T = TypeVar("T")
 
 
-@dataclass
+@dataclass  # type: ignore
 class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
-    width: int = None
-    height: int = None
-    cells: T = None
+    width: int = None  # type: ignore
+    height: int = None  # type: ignore
+    cells: T = None  # type: ignore
     swap: Iterator[Tuple[T, T]] = field(init=False)
 
     def __post_init__(self):
@@ -86,7 +96,7 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
 
     @classmethod
     @abc.abstractmethod
-    def from_2d_seq(cls, seq: Iterable[Iterable[Any]]) -> "BaseGrid":
+    def from_2d_seq(cls, seq: Sequence[Sequence[Any]]) -> "BaseGrid":
         """Create a Grid from a 2-dimensional sequence of cells.
 
         - It should derive width and height from the sequence's dimensions.
@@ -95,13 +105,33 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         """
 
     @classmethod
-    def from_seq(cls, seq: Iterable[Any], width: int) -> "BaseGrid":
+    def from_seq(cls, seq: Sequence[Any], width: int) -> "BaseGrid":
         """Create a Grid from a flat sequence of cells.
 
         The sequence is split up into rows by the given `width`. Height
         is determined by counting the number of rows after the split.
         """
         cells = chunks(seq, width)
+        return cls.from_2d_seq(tuple(cells))
+
+    @classmethod
+    def from_set(cls, set_obj: Set[Point]) -> "BaseGrid":
+        return NotImplemented
+
+    @classmethod
+    def from_str(cls, s: str, char_alive: str = "*") -> "BaseGrid":
+        """Parse a Grid from a string.
+
+        Each line in the `s` represents a row in the grid, and every char in
+        that line represents a cell in that row. If it's `char_alive` it's
+        read as a living cell; any other character is read as a dead cell.
+
+        Any whitespace at the beginning or end of each line is ignored.
+        """
+        cells = [
+            [ch == char_alive for ch in line.strip()]
+            for line in s.strip().splitlines()
+        ]
         return cls.from_2d_seq(cells)
 
     @abc.abstractmethod
@@ -113,7 +143,7 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
-    def calculate_size(self) -> (int, int):
+    def calculate_size(self) -> Tuple[int, int]:
         """Calculate the width and height of the grid from its `cells`.
 
         Returns the (width, height) pair as a tuple.
@@ -152,15 +182,16 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
     def __getitem__(self, point: Point) -> bool:
         return self.get_cell(self.cells, point)
 
-    __contains__ = __getitem__
+    def __contains__(self, item: object) -> bool:
+        if not isinstance(item, Point):
+            raise TypeError(f"expected a Point, got {type(item)}")
+        return self.__getitem__(item)
 
     def __setitem__(self, point: Point, value: bool):
         return self.set_cell(self.cells, point, value)
 
     def __iter__(self) -> Iterator[Point]:
-        for point, cell in self.enumerate_cells():
-            if cell:
-                yield Point(x, y)
+        return (point for point, cell in self.enumerate_cells() if cell)
 
     def __len__(self) -> int:
         return len(tuple(iter(self)))
@@ -191,7 +222,7 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         self.cells = next_cells
 
 
-def chunks(seq: Iterable, chunk_size: int) -> Iterator[Iterator]:
+def chunks(seq: Sequence, chunk_size: int) -> Iterator[Sequence]:
     start, end = 0, chunk_size
     while start < len(seq):
         yield seq[start:end]
