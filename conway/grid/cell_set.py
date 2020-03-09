@@ -14,9 +14,9 @@ from conway.grid import DIRS, BaseGrid, Point
 
 class Grid(BaseGrid[MutableSet[Point]]):
     @classmethod
-    def from_2d_seq(cls, seq: Sequence[Sequence[Any]]) -> "Grid":
-        width = max(len(row) for row in seq)
-        height = len(seq)
+    def from_2d_seq(cls, seq: Sequence[Sequence[Any]], **kwargs) -> "Grid":
+        width = kwargs.get("width") or max(len(row) for row in seq)
+        height = kwargs.get("height") or len(seq)
         cells = {
             Point(x, y)
             for y, row in enumerate(seq)

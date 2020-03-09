@@ -99,7 +99,7 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
 
     @classmethod
     @abc.abstractmethod
-    def from_2d_seq(cls, seq: Sequence[Sequence[Any]]) -> "BaseGrid":
+    def from_2d_seq(cls, seq: Sequence[Sequence[Any]], **kwargs) -> "BaseGrid":
         """Create a Grid from a 2-dimensional sequence of cells.
 
         - It should derive width and height from the sequence's dimensions.
@@ -108,14 +108,13 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         """
 
     @classmethod
-    def from_seq(cls, seq: Sequence[Any], width: int) -> "BaseGrid":
+    def from_seq(cls, seq: Sequence[Any], width: int, **kwargs) -> "BaseGrid":
         """Create a Grid from a flat sequence of cells.
 
-        The sequence is split up into rows by the given `width`. Height
-        is determined by counting the number of rows after the split.
+        The sequence is split up into rows by the given `width`.
         """
         cells = chunks(seq, width)
-        return cls.from_2d_seq(tuple(cells))
+        return cls.from_2d_seq(tuple(cells), width=width, **kwargs)
 
     @classmethod
     @abc.abstractmethod
@@ -123,7 +122,7 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         return NotImplemented
 
     @classmethod
-    def from_str(cls, s: str, char_alive: str = "*") -> "BaseGrid":
+    def from_str(cls, s: str, char_alive: str = "*", **kwargs) -> "BaseGrid":
         """Parse a Grid from a string.
 
         Each line in the `s` represents a row in the grid, and every char in
@@ -136,7 +135,7 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
             [ch == char_alive for ch in line.strip()]
             for line in s.strip().splitlines()
         ]
-        return cls.from_2d_seq(cells)
+        return cls.from_2d_seq(cells, **kwargs)
 
     @abc.abstractmethod
     def mk_zeroed_cells(self) -> T:

@@ -1,7 +1,7 @@
 import argparse
 import sys
 import time
-from typing import IO
+from typing import IO, Iterator
 
 from conway.grid import BaseGrid
 
@@ -28,18 +28,19 @@ def run(
         turns -= 1
 
 
-def run_iter(grid: BaseGrid, sep: str, turns: int):
+def run_iter(
+    grid: BaseGrid, sep: str = DEFAULT_SEP, turns: int = DEFAULT_TURNS
+) -> Iterator[str]:
     yield draw(grid, sep)
-
     while turns:
         grid.nextgen()
         yield draw(grid, sep)
         turns -= 1
 
 
-def render(grid: BaseGrid, sep: str, out: IO):
+def render(grid: BaseGrid, sep: str = DEFAULT_SEP, out: IO = DEFAULT_OUTFILE):
     print(draw(grid, sep), file=out)
 
 
-def draw(grid: BaseGrid, sep: str) -> str:
+def draw(grid: BaseGrid, sep: str = DEFAULT_SEP) -> str:
     return f"{sep}\n{grid}"

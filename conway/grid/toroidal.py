@@ -155,9 +155,11 @@ class Grid(BaseGrid[ToroidalArray]):
             row.extend(Cell.DEAD for _ in range(padding))
 
     @classmethod
-    def from_2d_seq(cls, seq: Sequence[Sequence[Any]]) -> "Grid":
+    def from_2d_seq(cls, seq: Sequence[Sequence[Any]], **kwargs) -> "Grid":
         cells = [[bool(cell) for cell in row] for row in seq]
-        return Grid(cells=ToroidalArray(cells, recursive=True, depth=1))
+        return Grid(
+            cells=ToroidalArray(cells, recursive=True, depth=1), **kwargs
+        )
 
     @classmethod
     def from_set(cls, set_: Set[Point], **kwargs) -> "Grid":
@@ -167,7 +169,9 @@ class Grid(BaseGrid[ToroidalArray]):
             [
                 [Point(x, y) in set_ for x in range(width)]
                 for y in range(height)
-            ]
+            ],
+            width=width,
+            height=height,
         )
 
     def mk_zeroed_cells(self) -> ToroidalArray:
