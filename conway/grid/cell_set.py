@@ -5,6 +5,7 @@ from typing import (
     MutableSet,
     NamedTuple,
     Sequence,
+    Set,
     Tuple,
 )
 
@@ -23,6 +24,10 @@ class Grid(BaseGrid[MutableSet[Point]]):
             if cell
         }
         return Grid(width, height, cells=cells)
+
+    @classmethod
+    def from_set(cls, set_: Set[Point], **kwargs) -> "Grid":
+        return Grid(cells=set(set_), **kwargs)
 
     def mk_zeroed_cells(self) -> MutableSet[Point]:
         return set()

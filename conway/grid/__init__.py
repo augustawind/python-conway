@@ -1,4 +1,5 @@
 import abc
+import copy
 import itertools
 import random
 from collections.abc import Collection
@@ -66,6 +67,8 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
             self.cells = self.mk_zeroed_cells()
         # If `cells` is given, ensure it matches the given dimensions.
         else:
+            # Prevent mutation of external object passed in `cells`.
+            self.cells = copy.copy(self.cells)
             width, height = self.calculate_size()
 
             if self.height is None:
@@ -115,7 +118,8 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         return cls.from_2d_seq(tuple(cells))
 
     @classmethod
-    def from_set(cls, set_obj: Set[Point]) -> "BaseGrid":
+    @abc.abstractmethod
+    def from_set(cls, set_: Set[Point], **kwargs) -> "BaseGrid":
         return NotImplemented
 
     @classmethod

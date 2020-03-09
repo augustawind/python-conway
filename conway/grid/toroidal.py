@@ -1,5 +1,5 @@
 from collections.abc import MutableSequence
-from typing import Any, Iterable, Iterator, Sequence, Tuple
+from typing import Any, Iterable, Iterator, Optional, Sequence, Set, Tuple
 
 from conway.grid import DIRS, BaseGrid, Cell, Point
 
@@ -110,6 +110,15 @@ class Grid(BaseGrid[ToroidalArray]):
     def from_2d_seq(cls, seq: Sequence[Sequence[Any]]) -> "Grid":
         cells = ((bool(cell) for cell in row) for row in seq)
         return Grid(cells=ToroidalArray(cells, recursive=True, depth=1))
+
+    @classmethod
+    def from_set(cls, set_: Set[Point], **kwargs) -> "Grid":
+        width = kwargs.get("width") or max(x for x, _ in set_)
+        height = kwargs.get("height") or max(y for _, y in set_)
+        seq = [
+            [Point(x, y) in set_ for x in range(width)] for y in range(height)
+        ]
+        return cls.from_2d_seq(seq)
 
     def mk_zeroed_cells(self) -> ToroidalArray:
         return ToroidalArray(
