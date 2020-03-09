@@ -78,6 +78,12 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         swap_cells = self.mk_zeroed_cells()
         self.swap = cycle(((self.cells, swap_cells), (swap_cells, self.cells)))
 
+    def __str__(self):
+        return "\n".join(
+            "".join([cell and "*" or "." for _, cell in row])
+            for row in chunks(tuple(self.enumerate_cells()), self.width)
+        )
+
     @classmethod
     @abc.abstractmethod
     def from_2d_seq(cls, seq: Iterable[Iterable[Any]]) -> "BaseGrid":
@@ -95,7 +101,7 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         The sequence is split up into rows by the given `width`. Height is
         determined by counting the number of rows after the split.
         """
-        cells = ichunks(seq, width)
+        cells = chunks(seq, width)
         return cls.from_2d_seq(cells)
 
     @abc.abstractmethod
@@ -185,9 +191,8 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         self.cells = next_cells
 
 
-def ichunks(seq: Iterable, chunk_size: int) -> Iterator[Iterator]:
-    length = len(seq)
+def chunks(seq: Iterable, chunk_size: int) -> Iterator[Iterator]:
     start, end = 0, chunk_size
-    while start < length:
-        yield itertools.islice(seq, start, end)
+    while start < len(seq):
+        yield seq[start:end]
         start, end = end, end + chunk_size

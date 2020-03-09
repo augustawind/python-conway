@@ -13,10 +13,8 @@ def main():
         prog="conway",
         description="Conway's Game of Life, a cellular automata simulation.",
     )
-
     parser.add_argument("width", type=int, help="the width of the grid")
     parser.add_argument("height", type=int, help="the height of the grid")
-
     parser.add_argument(
         "-t",
         "--turns",
@@ -24,7 +22,6 @@ def main():
         default="-1",
         help="number of turns to play (default: forever)",
     )
-
     parser.add_argument(
         "-d",
         "--delay",
@@ -32,7 +29,6 @@ def main():
         default="0.1",
         help="delay between turns, in seconds (default: %(default)s)",
     )
-
     parser.add_argument(
         "-s",
         "--separator",
@@ -44,7 +40,6 @@ def main():
     parser.add_argument(
         "-p", "--padding", type=int, default=2,
     )
-
     parser.add_argument(
         "-o",
         "--outfile",
@@ -57,7 +52,7 @@ def main():
 
     args.separator = args.separator.replace("+N", "\n")
 
-    grid1 = Grid.from_2d_seq(
+    grid = Grid.from_2d_seq(
         [
             [0, 0, 0, 0, 0],
             [0, 0, 1, 0, 0],
@@ -66,24 +61,20 @@ def main():
             [0, 0, 0, 0, 0],
         ]
     )
-    # grid1 = Grid(args.width, args.height)
-    # grid1.randomize()
+    # grid = Grid(args.width, args.height)
+    # grid.randomize()
+
+    print(str(grid), file=args.outfile)
 
     while args.turns:
         time.sleep(args.delay)
-        print(args.separator, file=args.outfile)
 
-        show_grid(grid1, args.outfile)
-        grid1.nextgen()
+        grid.nextgen()
+
+        print(args.separator, file=args.outfile)
+        print(str(grid), file=args.outfile)
 
         args.turns -= 1
-
-
-def show_grid(grid: Grid, outfile: IO):
-    for row in grid.cells:
-        for cell in row:
-            print("*" if cell else " ", end="", file=outfile)
-        print(file=outfile)
 
 
 if __name__ == "__main__":
