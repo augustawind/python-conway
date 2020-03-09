@@ -1,7 +1,7 @@
 import asyncio
 import re
 from dataclasses import dataclass
-from typing import NamedTuple, Optional
+from typing import Optional
 
 import websockets
 
@@ -38,6 +38,8 @@ CMD_SET_DELAY = "set-delay"
 CMD_RESTART = "restart"
 CMD_TICK = "tick"
 
+CHR_LINE_SEP = "/"
+
 
 class Controller:
     def __init__(
@@ -51,6 +53,9 @@ class Controller:
 
         self.paused = True
         self.playback = asyncio.Task(self.pause())
+
+    def send_grid(self):
+        return self.websocket.send(str(self.grid).replace("\n", CHR_LINE_SEP))
 
     async def dispatch(self, command: str, body: Optional[str] = None):
         if command == CMD_TOGGLE_PLAYBACK:
@@ -87,13 +92,13 @@ class Controller:
     async def play(self):
         self.paused = False
         while True:
-            await self.websocket.send(str(self.grid))
+            await self.send_grid()
             await asyncio.sleep(self.delay)
             self.grid.tick()
 
     async def pause(self):
         self.paused = True
-        await self.websocket.send(str(self.grid))
+        await self.send_grid()
 
     async def set_delay(self, delay: float):
         self.delay = delay
@@ -104,14 +109,14 @@ class Controller:
     async def tick(self, n: Optional[int] = None):
         for _ in range(n or 1):
             self.grid.tick()
-        await self.websocket.send(str(self.grid))
+        await self.send_grid()
 
 
-async def server_handler(
-    websocket: websockets.WebSocketServerProtocol, path: str
-):
+async def init_controller(
+    websocket: websockets.WebSocketServerProtocol,
+) -> Controller:
     async for msg in websocket:
-        match = RE_MSG.fullmatch(str(msg))
+        match = RE_MSG.fullmatch(str(msg).strip())
         if not match:
             await websocket.send(MSG_SYNTAX_ERR)
             continue
@@ -130,12 +135,20 @@ async def server_handler(
             await websocket.send(MSG_MISSING_VALUE.format(CMD_NEW_GRID))
             continue
 
-        grid = Grid.from_str(body)
-        controller = Controller(websocket, grid)
         break
 
+    body = body.replace(CHR_LINE_SEP, "\n")
+    grid = Grid.from_str(body)
+    return Controller(websocket, grid)
+
+
+async def server_handler(
+    websocket: websockets.WebSocketServerProtocol, path: str
+):
+    controller = await init_controller(websocket)
+
     async for msg in websocket:
-        match = RE_MSG.fullmatch(str(msg))
+        match = RE_MSG.fullmatch(str(msg).strip())
         if not match:
             await websocket.send(MSG_SYNTAX_ERR)
             continue
