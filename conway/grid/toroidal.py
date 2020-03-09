@@ -1,10 +1,37 @@
+import _collections_abc
 from collections.abc import MutableSequence
-from typing import Any, Iterable, Iterator, Optional, Sequence, Set, Tuple
+from typing import (
+    Any,
+    Generic,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 from conway.grid import DIRS, BaseGrid, Cell, Point
 
 
-class ToroidalArray(MutableSequence):
+class CompositeIterable(Iterable):
+
+    __slots__ = ()
+
+    @classmethod
+    def __subclasshook__(cls, C):
+        if cls is CompositeIterable:
+            return hasattr(C, "__iter__") and not issubclass(C, (str, bytes))
+        return NotImplemented
+
+
+T = TypeVar("T")
+
+
+class ToroidalArray(MutableSequence, Generic[T]):
     """An array whose indices wrap around indefinitely.
 
     This basically acts like a Python ``list`` with different behavior for
@@ -34,13 +61,23 @@ class ToroidalArray(MutableSequence):
     def __init__(
         self, seq: Iterable = (), recursive: bool = False, depth: int = -1
     ):
-        self._list = list(seq)
-        if recursive and depth:
-            for i, item in enumerate(self._list):
-                if not isinstance(item, (str, bytes)) and isinstance(
-                    item, Iterable
-                ):
-                    self._list[i] = ToroidalArray(item, True, depth - 1)
+        self._list: List[T] = list()
+        self.recursive = recursive
+        self.recursion_depth = depth
+
+        self.extend(seq)
+
+    def process_item(self, item: T) -> Union[T, "ToroidalArray[T]"]:
+        if (
+            self.recursive
+            and self.recursion_depth
+            and isinstance(item, CompositeIterable)
+            and type(item) is not ToroidalArray
+        ):
+            return ToroidalArray(
+                item, recursive=True, depth=self.recursion_depth - 1
+            )
+        return item
 
     def __str__(self):
         return "{}({!s})".format(self.__class__.__name__, self._list)
@@ -64,14 +101,20 @@ class ToroidalArray(MutableSequence):
 
     def __setitem__(self, index, value):
         idx = self._wrapped_index(index)
-        self._list[idx] = value
+        self._list[idx] = self.process_item(value)
 
     def __delitem__(self, index):
         idx = self._wrapped_index(index)
         del self._list[idx]
 
     def insert(self, index, value):
-        return self._list.insert(index, value)
+        return self._list.insert(index, self.process_item(value))
+
+    def append(self, value):
+        self._list.append(self.process_item(value))
+
+    def extend(self, values):
+        self._list.extend(self.process_item(val) for val in values)
 
     def __iter__(self):
         return iter(self._list)
@@ -108,7 +151,7 @@ class Grid(BaseGrid[ToroidalArray]):
 
     @classmethod
     def from_2d_seq(cls, seq: Sequence[Sequence[Any]]) -> "Grid":
-        cells = ((bool(cell) for cell in row) for row in seq)
+        cells = [[bool(cell) for cell in row] for row in seq]
         return Grid(cells=ToroidalArray(cells, recursive=True, depth=1))
 
     @classmethod
