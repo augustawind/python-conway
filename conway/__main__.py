@@ -20,32 +20,29 @@ def main():
         "-t",
         "--turns",
         type=int,
-        default="-1",
+        default=conway.DEFAULT_TURNS,
         help="number of turns to play (default: forever)",
     )
     parser.add_argument(
         "-d",
         "--delay",
         type=float,
-        default="0.1",
+        default=conway.DEFAULT_DELAY,
         help="delay between turns, in seconds (default: %(default)s)",
     )
     parser.add_argument(
         "-s",
         "--separator",
         type=str,
-        default="%",
+        default=conway.DEFAULT_SEP,
         help="char(s) used to separate each turn's output"
         " (default: %(default)s)",
-    )
-    parser.add_argument(
-        "-p", "--padding", type=int, default=2,
     )
     parser.add_argument(
         "-o",
         "--outfile",
         type=argparse.FileType("w"),
-        default=sys.stdout,
+        default=conway.DEFAULT_OUTFILE,
         help="output destination (default: %(default)s)",
     )
     args = parser.parse_args()
@@ -66,7 +63,13 @@ def main():
     args.separator *= grid.width // len(args.separator)
 
     # Run it!
-    conway.run(grid, args.delay, args.separator, args.turns, args.outfile)
+    conway.run(
+        grid,
+        delay=args.delay,
+        sep=args.separator,
+        turns=args.turns,
+        out=args.outfile,
+    )
 
 
 if __name__ == "__main__":
