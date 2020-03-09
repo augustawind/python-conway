@@ -101,9 +101,12 @@ def main():
         default=conway.DEFAULT_OUTFILE,
         help="output destination (default: %(default)s)",
     )
-
     args = parser.parse_args()
 
+    # Expand separator to a full line.
+    args.separator *= grid.width // len(args.separator)
+
+    # Randomly generate the grid.
     if args.random is not None:
         if not (args.width and args.height):
             parser.error(
@@ -116,30 +119,17 @@ def main():
         grid = Grid(args.width, args.height)
         grid.randomize(k=args.random)
 
+    # Load a sample pattern.
     elif args.sample:
         sample_path = SAMPLE_DIR / args.sample
         with open(sample_path) as fd:
             pattern = fd.read()
         grid = Grid.from_str(pattern, char_alive=args.char_alive)
 
+    # Load a pattern from a file.
     elif args.file:
         pattern = args.file.read()
         grid = Grid.from_str(pattern, char_alive=args.char_alive)
-
-    grid = Grid.from_2d_seq(
-        [
-            [0, 0, 0, 0, 0],
-            [0, 0, 1, 0, 0],
-            [0, 0, 1, 0, 0],
-            [0, 0, 1, 0, 0],
-            [0, 0, 0, 0, 0],
-        ]
-    )
-    # grid = Grid(args.width, args.height)
-    # grid.randomize()
-
-    # Expand separator to a full line.
-    args.separator *= grid.width // len(args.separator)
 
     # Run it!
     conway.run(
