@@ -1,11 +1,11 @@
 import pytest
 
-from conway.grid import Point
+from conway.grid import Cell, Point
 from conway.grid.toroidal import Grid, ToroidalArray
 
 P = Point
-T = True
-F = False
+T = Cell.ALIVE
+F = Cell.DEAD
 
 
 class TestToroidalArray:

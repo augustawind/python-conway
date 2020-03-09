@@ -20,10 +20,10 @@ class Grid(BaseGrid[MutableSet[Point]]):
     def calculate_size(self) -> (int, int):
         max_x = max_y = 0
         for x, y in self.cells:
-            if x > max_x:
-                max_x = x
-            if y > max_y:
-                max_y = y
+            if x + 1 > max_x:
+                max_x = x + 1
+            if y + 1 > max_y:
+                max_y = y + 1
         return max_x, max_y
 
     @classmethod

@@ -8,7 +8,7 @@ from typing import Any, Generic, Iterable, Iterator, NamedTuple, Tuple, TypeVar
 
 
 class Cell:
-    LIVE = True
+    ALIVE = True
     DEAD = False
 
 
@@ -88,7 +88,7 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def from_2d_seq(cls, seq: Iterable[Iterable[Any]]) -> "BaseGrid":
         """Create a Grid from a 2-dimensional sequence of cells.
-        
+
         - It should derive width and height from the sequence's dimensions.
         - Since all Python objects have a truthiness value, it should accept
           any item type and convert each item to a bool if necessary.
@@ -98,8 +98,8 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
     def from_seq(cls, seq: Iterable[Any], width: int) -> "BaseGrid":
         """Create a Grid from a flat sequence of cells.
 
-        The sequence is split up into rows by the given `width`. Height is
-        determined by counting the number of rows after the split.
+        The sequence is split up into rows by the given `width`. Height
+        is determined by counting the number of rows after the split.
         """
         cells = chunks(seq, width)
         return cls.from_2d_seq(cells)
@@ -108,14 +108,14 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
     def mk_zeroed_cells(self) -> T:
         """Return a zeroed cells collection (type `T`).
 
-        The returned collection should have the same dimensions as the Grid's
-        current cells (width x height).
+        The returned collection should have the same dimensions as the
+        Grid's current cells (width x height).
         """
 
     @abc.abstractmethod
     def calculate_size(self) -> (int, int):
         """Calculate the width and height of the grid from its `cells`.
-        
+
         Returns the (width, height) pair as a tuple.
         """
 
