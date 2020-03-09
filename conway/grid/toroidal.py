@@ -67,7 +67,25 @@ class ToroidalArray(MutableSequence, Generic[T]):
 
         self.extend(seq)
 
-    def process_item(self, item: T) -> Union[T, "ToroidalArray[T]"]:
+    def __str__(self):
+        return "{}({!s})".format(self.__class__.__name__, self._list)
+
+    def __repr__(self):
+        return "{}({!r})".format(self.__class__.__name__, self._list)
+
+    def _wrapped_index(self, index):
+        """Return a regular (wrapped) index given an out of range index."""
+        wrapped = -index % len(self)
+        if wrapped:
+            return len(self) - wrapped
+        return 0
+
+    def _process_item(self, item: T) -> Union[T, "ToroidalArray[T]"]:
+        """Prepare an item for insertion into the array.
+
+        This should be called by all of the insertion methods (append,
+        __setitem__, etc.) on all values coming in to get the correct value.
+        """
         if (
             self.recursive
             and self.recursion_depth
@@ -79,21 +97,8 @@ class ToroidalArray(MutableSequence, Generic[T]):
             )
         return item
 
-    def __str__(self):
-        return "{}({!s})".format(self.__class__.__name__, self._list)
-
-    def __repr__(self):
-        return "{}({!r})".format(self.__class__.__name__, self._list)
-
     def __len__(self):
         return len(self._list)
-
-    def _wrapped_index(self, index):
-        """Return a regular (wrapped) index given an out of range index."""
-        wrapped = -index % len(self)
-        if wrapped:
-            return len(self) - wrapped
-        return 0
 
     def __getitem__(self, index):
         idx = self._wrapped_index(index)
@@ -101,20 +106,20 @@ class ToroidalArray(MutableSequence, Generic[T]):
 
     def __setitem__(self, index, value):
         idx = self._wrapped_index(index)
-        self._list[idx] = self.process_item(value)
+        self._list[idx] = self._process_item(value)
 
     def __delitem__(self, index):
         idx = self._wrapped_index(index)
         del self._list[idx]
 
     def insert(self, index, value):
-        return self._list.insert(index, self.process_item(value))
+        return self._list.insert(index, self._process_item(value))
 
     def append(self, value):
-        self._list.append(self.process_item(value))
+        self._list.append(self._process_item(value))
 
     def extend(self, values):
-        self._list.extend(self.process_item(val) for val in values)
+        self._list.extend(self._process_item(val) for val in values)
 
     def __iter__(self):
         return iter(self._list)
