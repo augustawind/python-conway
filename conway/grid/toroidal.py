@@ -163,14 +163,21 @@ class Grid(BaseGrid[ToroidalArray]):
     def from_set(cls, set_: Set[Point], **kwargs) -> "Grid":
         width = kwargs.get("width") or max(x for x, _ in set_)
         height = kwargs.get("height") or max(y for _, y in set_)
-        seq = [
-            [Point(x, y) in set_ for x in range(width)] for y in range(height)
-        ]
-        return cls.from_2d_seq(seq)
+        return cls.from_2d_seq(
+            [
+                [Point(x, y) in set_ for x in range(width)]
+                for y in range(height)
+            ]
+        )
 
     def mk_zeroed_cells(self) -> ToroidalArray:
         return ToroidalArray(
-            [[Cell.DEAD] * self.width] * self.height, recursive=True, depth=1,
+            [
+                [Cell.DEAD for _ in range(self.width)]
+                for _ in range(self.height)
+            ],
+            recursive=True,
+            depth=1,
         )
 
     def calculate_size(self) -> Tuple[int, int]:
