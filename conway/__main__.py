@@ -33,7 +33,7 @@ def main():
         "-s",
         "--separator",
         type=str,
-        default="+N---+N",
+        default="%",
         help="text separator between output of each turn; the character"
         " sequence `+N` denotes a newline (default: %(default)s')",
     )
@@ -67,14 +67,15 @@ def main():
     print(str(grid), file=args.outfile)
 
     while args.turns:
-        time.sleep(args.delay)
-
-        grid.nextgen()
-
-        print(args.separator, file=args.outfile)
-        print(str(grid), file=args.outfile)
-
+        tick(grid, args)
         args.turns -= 1
+
+
+def tick(grid: Grid, args: argparse.Namespace):
+    time.sleep(args.delay)
+    grid.nextgen()
+    print(args.separator, file=args.outfile)
+    print(str(grid), file=args.outfile)
 
 
 if __name__ == "__main__":
