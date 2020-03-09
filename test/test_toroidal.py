@@ -1,4 +1,9 @@
+import pytest
+
 from conway.grid.toroidal import Grid, Point, ToroidalArray
+
+T = True
+F = False
 
 
 class TestToroidalArray:
@@ -85,36 +90,73 @@ class TestToroidalArray:
         assert t._list == [2, 3]
 
 
+def g2l(grid: Grid) -> list:
+    return [list(row) for row in grid.cells]
+
+
+def tarray(seq=()) -> ToroidalArray:
+    return ToroidalArray(seq, recursive=True)
+
+
+class TestGrid:
+    def test_init_with_width_and_height(self):
+        grid = Grid(width=3, height=2)
+        assert (grid.width, grid.height) == (3, 2)
+        assert g2l(grid) == [[F] * 3] * 2
+
+        with pytest.raises(ValueError):
+            grid = Grid(width=3)
+        with pytest.raises(ValueError):
+            grid = Grid(height=3)
+        with pytest.raises(ValueError):
+            grid = Grid(width=3, height=0)
+        with pytest.raises(ValueError):
+            grid = Grid(width=0, height=3)
+        with pytest.raises(ValueError):
+            grid = Grid(width=0, height=0)
+        with pytest.raises(ValueError):
+            grid = Grid()
+
+    def test_init_with_cells(self):
+        grid = Grid(cells=tarray([[1, 0, 0], [0, 1, 1]]))
+        assert (grid.width, grid.height) == (3, 2)
+        assert g2l(grid) == [[T, F, F], [F, T, T]]
+
+        grid = Grid(cells=tarray([[0, 0, 0], [0, 1, 0], [0, 1, 0]]))
+        assert (grid.width, grid.height) == (3, 3)
+        assert g2l(grid) == [[F, F, F], [F, T, F], [F, T, F]]
+
+
 class TestRules:
     def test_rule_1(self):
         """Any live cell with fewer than 2 live neighbors dies."""
-        t = Grid.from_2d_seq([[0, 0, 0], [0, 1, 1], [0, 0, 0]])
+        grid = Grid.from_2d_seq([[0, 0, 0], [0, 1, 1], [0, 0, 0]])
 
-        t.nextgen()
-        assert len(t) == 0
+        grid.nextgen()
+        assert len(grid) == 0
 
     def test_rule_2(self):
         """Any live cell with 2 or 3 neighbors lives on."""
-        t = Grid.from_2d_seq([[0, 1, 0], [0, 1, 1], [0, 0, 0]])
+        grid = Grid.from_2d_seq([[0, 1, 0], [0, 1, 1], [0, 0, 0]])
 
-        t.nextgen()
-        assert t[Point(1, 0)] == 1
-        assert t[Point(1, 1)] == 1
-        assert t[Point(2, 1)] == 1
+        grid.nextgen()
+        assert grid[Point(1, 0)] == 1
+        assert grid[Point(1, 1)] == 1
+        assert grid[Point(2, 1)] == 1
 
     def test_rule_3(self):
         """Any live cell with more than 3 live neighbors dies."""
-        t = Grid.from_2d_seq(
-            [[0, 0, 0, 0], [0, 1, 1, 0], [0, 1, 1, 1], [0, 0, 0, 0]],
+        grid = Grid.from_2d_seq(
+            [[0, 0, 0, 0], [0, 1, 1, 0], [0, 1, 1, 1], [0, 0, 0, 0]]
         )
 
-        t.nextgen()
-        assert t[Point(2, 1)] == 0
-        assert t[Point(2, 2)] == 0
+        grid.nextgen()
+        assert grid[Point(2, 1)] == 0
+        assert grid[Point(2, 2)] == 0
 
     def test_rule_4(self):
         """Any dead cell with exactly three live neighbors becomees a live cell."""
-        t = Grid.from_2d_seq([[0, 0, 0], [0, 0, 1], [0, 1, 1],])
+        grid = Grid.from_2d_seq([[0, 0, 0], [0, 0, 1], [0, 1, 1]])
 
-        t.nextgen()
-        assert t[Point(1, 1)] == 1
+        grid.nextgen()
+        assert grid[Point(1, 1)] == 1
