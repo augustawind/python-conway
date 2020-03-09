@@ -65,15 +65,8 @@ def main():
     # Expand separator to a full line.
     args.separator *= grid.width // len(args.separator)
 
-    print(str(grid), file=args.outfile)
-    conway.play(grid, args.delay, args.separator, args.turns, args.outfile)
-
-
-def tick(grid: Grid, args: argparse.Namespace):
-    time.sleep(args.delay)
-    grid.nextgen()
-    print(args.separator, file=args.outfile)
-    print(str(grid), file=args.outfile)
+    # Run it!
+    conway.run(grid, args.delay, args.separator, args.turns, args.outfile)
 
 
 if __name__ == "__main__":

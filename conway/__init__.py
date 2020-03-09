@@ -5,7 +5,7 @@ from typing import IO
 from conway.grid import BaseGrid
 
 
-def play(grid: BaseGrid, delay: float, sep: str, turns: int, outfile: IO):
+def run(grid: BaseGrid, delay: float, sep: str, turns: int, outfile: IO):
     render(grid, sep, outfile)
     time.sleep(delay)
 
@@ -16,16 +16,18 @@ def play(grid: BaseGrid, delay: float, sep: str, turns: int, outfile: IO):
         turns -= 1
 
 
-def play_iter(grid: BaseGrid, sep: str, turns: int):
+def run_iter(grid: BaseGrid, sep: str, turns: int):
+    yield draw(grid, sep)
+
     while turns:
-        yield tick(grid)
+        grid.nextgen()
+        yield draw(grid, sep)
         turns -= 1
 
 
-def tick(grid: BaseGrid):
-    grid.nextgen()
-    return str(grid)
-
-
 def render(grid: BaseGrid, sep: str, outfile: IO):
-    print(f"{sep}\n{grid}")
+    print(draw(grid, sep), file=outfile)
+
+
+def draw(grid: BaseGrid, sep: str) -> str:
+    return f"{sep}\n{grid}"
