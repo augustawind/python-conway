@@ -126,6 +126,14 @@ class TestGrid:
         assert (grid.width, grid.height) == (3, 3)
         assert g2l(grid) == [[F, F, F], [F, T, F], [F, T, F]]
 
+        grid = Grid(cells=tarray([[0, 0, 0], [0, 1, 0], [0, 1, 0]]), width=4)
+        assert (grid.width, grid.height) == (4, 3)
+        assert g2l(grid) == [[F, F, F, F], [F, T, F, F], [F, T, F, F]]
+
+        grid = Grid(cells=tarray([[0, 0, 0], [0, 1, 0], [0, 1, 0]]), height=4)
+        assert (grid.width, grid.height) == (3, 4)
+        assert g2l(grid) == [[F, F, F], [F, T, F], [F, T, F], [F, F, F]]
+
 
 class TestRules:
     def test_rule_1(self):

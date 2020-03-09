@@ -96,14 +96,14 @@ class Grid(BaseGrid[ToroidalArray]):
         super().__post_init__()
 
         # Pad grid with dead rows to reach `self.height`.
-        padding = min(0, self.height - len(self.cells))
+        padding = max(0, self.height - len(self.cells))
         self.cells.extend(
-            [Cell.DEAD for _ in self.width] for _ in range(padding)
+            [Cell.DEAD for _ in range(self.width)] for _ in range(padding)
         )
 
         # Pad short rows with dead cells to reach `self.width`.
         for row in self.cells:
-            padding = min(0, self.width - len(row))
+            padding = max(0, self.width - len(row))
             row.extend(Cell.DEAD for _ in range(padding))
 
     @classmethod
