@@ -19,6 +19,6 @@ setup(
     description="A Python implementation of Conway's Game of Life.",
     long_description=readme(),
     include_package_data=True,
-    packages=["conway"],
+    packages=["conway", "conway_server"],
     entry_points={"console_scripts": ["conway = conway.__main__:main"]},
 )
