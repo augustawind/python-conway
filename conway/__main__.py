@@ -30,9 +30,11 @@ def main():
         nargs="?",
         const=0.5,
         metavar="K",
-        help="Randomly generate the initial grid. If given, `%(metavar)s` must"
-        " be a number in the range [0, 1) and sets the probability that a cell"
-        " will be living. If no value is given, it defaults to %(const)s.",
+        help=(
+            "randomly generate the initial grid. if given, %(metavar)s must"
+            " be a number in the range [0, 1) and sets the probability that a"
+            " cell will be living (default: %(const)s)"
+        ),
     )
     arg_sample = source_group.add_argument(
         "--sample",
@@ -54,9 +56,11 @@ def main():
         "--char-alive",
         default="*",
         metavar="CHAR",
-        help="char that represents a living cell when used with the"
-        " {s} or {f} options".format(
-            s=fmt_arg(arg_sample), f=fmt_arg(arg_file)
+        help=(
+            "char that represents a living cell when used with the"
+            " {s} or {f} options".format(
+                s=fmt_arg(arg_sample), f=fmt_arg(arg_file)
+            )
         ),
     )
 
@@ -85,8 +89,10 @@ def main():
         "--separator",
         type=str,
         default=conway.DEFAULT_SEP,
-        help="char(s) used to separate each turn's output"
-        " (default: %(default)s)",
+        help=(
+            "char(s) used to separate each turn's output"
+            " (default: %(default)s)"
+        ),
     )
     parser.add_argument(
         "-o",
