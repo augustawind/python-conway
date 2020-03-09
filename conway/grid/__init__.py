@@ -57,18 +57,18 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
             self.cells = self.mk_zeroed_cells()
         # If `cells` is given, ensure it matches the given dimensions.
         else:
-            height = self.get_max_height()
+            width, height = self.calculate_size()
+
             if self.height is None:
                 self.height = height
-            elif self.height != height:
+            elif self.height < height:
                 raise ValueError(
                     "given `height` does not match actual height of `cells`"
                 )
 
-            max_width = self.get_max_width()
             if self.width is None:
-                self.width = max_width
-            elif self.width != max_width:
+                self.width = width
+            elif self.width < width:
                 raise ValueError(
                     "given `width` does not match actual width of `cells`"
                 )
@@ -95,16 +95,11 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
-    def get_max_width(self) -> int:
-        """Return the length of the longest "row" in the Grid.
+    def calculate_size(self) -> (int, int):
+        """Calculate the width and height of the grid from its `cells`.
         
-        Row length should be determined by calculating the distance between
-        the first and last living cells in the row.
+        Returns the (width, height) pair as a tuple.
         """
-
-    @abc.abstractmethod
-    def get_max_height(self) -> int:
-        """Return the number of rows in the Grid."""
 
     @staticmethod
     @abc.abstractmethod
@@ -173,6 +168,6 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
                 self.set_cell(next_cells, point, True)
             # Otherwise, it stays the same.
             else:
-                self.set_cell(next_cells, point, self.get_cell(cells, point))
+                self.set_cell(next_cells, point, self[point])
 
         self.cells = next_cells

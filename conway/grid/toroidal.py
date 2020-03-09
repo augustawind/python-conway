@@ -111,11 +111,10 @@ class Grid(BaseGrid[ToroidalArray]):
             [[Cell.DEAD] * self.width] * self.height, recursive=True, depth=1,
         )
 
-    def get_max_width(self) -> int:
-        return max(len(row) for row in self.cells)
-
-    def get_max_height(self) -> int:
-        return len(self.cells)
+    def calculate_size(self) -> (int, int):
+        width = max(len(row) for row in self.cells)
+        height = len(self.cells)
+        return width, height
 
     @staticmethod
     def get_cell(cells: ToroidalArray, point: Point) -> bool:
