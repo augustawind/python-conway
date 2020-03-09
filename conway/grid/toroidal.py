@@ -121,12 +121,12 @@ class Grid(BaseGrid[ToroidalArray]):
         height = len(self.cells)
         return width, height
 
-    @staticmethod
-    def get_cell(cells: ToroidalArray, point: Point) -> bool:
+    @classmethod
+    def get_cell(cls, cells: ToroidalArray, point: Point) -> bool:
         return cells[point.y][point.x]
 
-    @staticmethod
-    def set_cell(cells: ToroidalArray, point: Point, value: bool):
+    @classmethod
+    def set_cell(cls, cells: ToroidalArray, point: Point, value: bool):
         cells[point.y][point.x] = value
 
     def enumerate_cells(self) -> Iterator[Tuple[Point, bool]]:

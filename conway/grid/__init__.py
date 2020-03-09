@@ -113,14 +113,14 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         Returns the (width, height) pair as a tuple.
         """
 
-    @staticmethod
+    @classmethod
     @abc.abstractmethod
-    def get_cell(cells: T, point: Point) -> bool:
+    def get_cell(cls, cells: T, point: Point) -> bool:
         """Return the cell at the given Point."""
 
-    @staticmethod
+    @classmethod
     @abc.abstractmethod
-    def set_cell(cells: T, point: Point, value: bool):
+    def set_cell(cls, cells: T, point: Point, value: bool):
         """Set the cell at the given Point to the given value."""
 
     @abc.abstractmethod
