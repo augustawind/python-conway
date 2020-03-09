@@ -46,8 +46,6 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
     swap: Iterator[Tuple[T, T]] = field(init=False)
 
     def __post_init__(self):
-        if self.width == 0 or self.height == 0:
-            raise ValueError("`width` and `height` must be greater than zero")
         if self.cells is None and not (self.width and self.height):
             raise ValueError(
                 "one of (`width` AND `height`) OR `cells` must be set"
@@ -73,6 +71,9 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
                 raise ValueError(
                     "given `width` does not match actual width of `cells`"
                 )
+
+        if self.width == 0 or self.height == 0:
+            raise ValueError("`width` and `height` must be greater than zero")
 
         swap_cells = self.mk_zeroed_cells()
         self.swap = cycle(((self.cells, swap_cells), (swap_cells, self.cells)))

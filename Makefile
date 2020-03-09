@@ -35,7 +35,12 @@ deps:
 # Format code.
 .PHONY: fmt
 fmt:
-	pyfmt --select $(if $(SELECT),$(SELECT),$(if $(AMEND),staged,modified)) $(if $(AMEND),--commit amend --commit-msg)
+	pyfmt --select $(if $(SELECT),$(SELECT),staged) $(if $(AMEND),--commit amend --commit-msg)
+
+# Format code and stage changes.
+.PHONY: fix
+fix: fmt
+	git add -u
 
 # Run tests.
 .PHONY: test

@@ -126,6 +126,12 @@ class TestGrid:
         assert (grid.width, grid.height) == (3, 3)
         assert g2l(grid) == [[F, F, F], [F, T, F], [F, T, F]]
 
+        grid = Grid(
+            cells=tarray([[0, 0, 0], [0, 1, 0], [0, 1, 0]]), width=3, height=3
+        )
+        assert (grid.width, grid.height) == (3, 3)
+        assert g2l(grid) == [[F, F, F], [F, T, F], [F, T, F]]
+
         grid = Grid(cells=tarray([[0, 0, 0], [0, 1, 0], [0, 1, 0]]), width=4)
         assert (grid.width, grid.height) == (4, 3)
         assert g2l(grid) == [[F, F, F, F], [F, T, F, F], [F, T, F, F]]
@@ -133,6 +139,32 @@ class TestGrid:
         grid = Grid(cells=tarray([[0, 0, 0], [0, 1, 0], [0, 1, 0]]), height=4)
         assert (grid.width, grid.height) == (3, 4)
         assert g2l(grid) == [[F, F, F], [F, T, F], [F, T, F], [F, F, F]]
+
+        with pytest.raises(ValueError):
+            grid = Grid(
+                cells=tarray([[0, 0, 0], [0, 1, 0], [0, 1, 0]]), height=2
+            )
+        with pytest.raises(ValueError):
+            grid = Grid(
+                cells=tarray([[0, 0, 0], [0, 1, 0], [0, 1, 0]]), width=2
+            )
+
+        with pytest.raises(ValueError):
+            grid = Grid(cells=tarray([]))
+        with pytest.raises(ValueError):
+            grid = Grid(cells=tarray([[]]))
+        with pytest.raises(ValueError):
+            grid = Grid(cells=tarray([]), width=2)
+        with pytest.raises(ValueError):
+            grid = Grid(cells=tarray([]), height=2)
+
+        grid = Grid(cells=tarray([[]]), width=2)
+        assert (grid.width, grid.height) == (2, 1)
+        assert g2l(grid) == [[F, F]]
+
+        grid = Grid(cells=tarray([[], []]), width=2)
+        assert (grid.width, grid.height) == (2, 2)
+        assert g2l(grid) == [[F, F], [F, F]]
 
 
 class TestRules:
