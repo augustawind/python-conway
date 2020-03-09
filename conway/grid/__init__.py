@@ -1,4 +1,5 @@
 import abc
+import itertools
 import random
 from collections.abc import Collection
 from dataclasses import dataclass, field
@@ -76,24 +77,25 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         swap_cells = self.mk_zeroed_cells()
         self.swap = cycle(((self.cells, swap_cells), (swap_cells, self.cells)))
 
-    @staticmethod
+    @classmethod
     @abc.abstractmethod
-    def from_seq(seq: Iterable[Any], width: int) -> "BaseGrid":
-        """Create a Grid from a flat sequence of cells.
-
-        The sequence is split up into rows by the given `width`. Height is
-        determined by counting the number of rows after the split.
-        """
-
-    @staticmethod
-    @abc.abstractmethod
-    def from_2d_seq(seq: Iterable[Iterable[Any]]) -> "BaseGrid":
+    def from_2d_seq(cls, seq: Iterable[Iterable[Any]]) -> "BaseGrid":
         """Create a Grid from a 2-dimensional sequence of cells.
         
         - It should derive width and height from the sequence's dimensions.
         - Since all Python objects have a truthiness value, it should accept
           any item type and convert each item to a bool if necessary.
         """
+
+    @classmethod
+    def from_seq(cls, seq: Iterable[Any], width: int) -> "BaseGrid":
+        """Create a Grid from a flat sequence of cells.
+
+        The sequence is split up into rows by the given `width`. Height is
+        determined by counting the number of rows after the split.
+        """
+        cells = ichunks(seq, width)
+        return cls.from_2d_seq(cells)
 
     @abc.abstractmethod
     def mk_zeroed_cells(self) -> T:
@@ -180,3 +182,11 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
                 self.set_cell(next_cells, point, self[point])
 
         self.cells = next_cells
+
+
+def ichunks(seq: Iterable, chunk_size: int) -> Iterator[Iterator]:
+    length = len(seq)
+    start, end = 0, chunk_size
+    while start < length:
+        yield itertools.islice(seq, start, end)
+        start, end = end, end + chunk_size

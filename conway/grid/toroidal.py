@@ -1,4 +1,3 @@
-import itertools
 from collections.abc import MutableSequence
 from typing import Any, Iterable, Iterator, Tuple
 
@@ -92,14 +91,6 @@ class ToroidalArray(MutableSequence):
         return ToroidalArray(self._list * n)
 
 
-def ichunks(seq: Iterable, chunk_size: int) -> Iterator[Iterator]:
-    length = len(seq)
-    start, end = 0, chunk_size
-    while start < length:
-        yield itertools.islice(seq, start, end)
-        start, end = end, end + chunk_size
-
-
 class Grid(BaseGrid[ToroidalArray]):
     def __post_init__(self):
         super().__post_init__()
@@ -115,13 +106,8 @@ class Grid(BaseGrid[ToroidalArray]):
             padding = min(0, self.width - len(row))
             row.extend(Cell.DEAD for _ in range(padding))
 
-    @staticmethod
-    def from_seq(seq: Iterable[Any], width: int) -> "Grid":
-        cells = ichunks(seq, width)
-        return Grid.from_2d_seq(cells)
-
-    @staticmethod
-    def from_2d_seq(seq: Iterable[Iterable[Any]]) -> "Grid":
+    @classmethod
+    def from_2d_seq(cls, seq: Iterable[Iterable[Any]]) -> "Grid":
         cells = ((bool(cell) for cell in row) for row in seq)
         return Grid(cells=ToroidalArray(cells, recursive=True, depth=1))
 
