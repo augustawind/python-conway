@@ -95,11 +95,16 @@ class Grid(BaseGrid[ToroidalArray]):
     def __post_init__(self):
         super().__post_init__()
 
-        # Add padding as needed so rows have uniform widths.
+        # Pad grid with dead rows to reach `self.height`.
+        padding = min(0, self.height - len(self.cells))
+        self.cells.extend(
+            [Cell.DEAD for _ in self.width] for _ in range(padding)
+        )
+
+        # Pad short rows with dead cells to reach `self.width`.
         for row in self.cells:
             padding = min(0, self.width - len(row))
-            if padding:
-                row.extend([Cell.DEAD] * padding)
+            row.extend(Cell.DEAD for _ in range(padding))
 
     @staticmethod
     def from_2d_seq(seq: Iterable[Iterable[Any]]) -> "Grid":
