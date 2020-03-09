@@ -1,7 +1,9 @@
 import pytest
 
-from conway.grid.toroidal import Grid, Point, ToroidalArray
+from conway.grid import Point
+from conway.grid.toroidal import Grid, ToroidalArray
 
+P = Point
 T = True
 F = False
 
@@ -180,9 +182,9 @@ class TestRules:
         grid = Grid.from_2d_seq([[0, 1, 0], [0, 1, 1], [0, 0, 0]])
 
         grid.nextgen()
-        assert grid[Point(1, 0)] == 1
-        assert grid[Point(1, 1)] == 1
-        assert grid[Point(2, 1)] == 1
+        assert grid[P(1, 0)] == 1
+        assert grid[P(1, 1)] == 1
+        assert grid[P(2, 1)] == 1
 
     def test_rule_3(self):
         """Any live cell with more than 3 live neighbors dies."""
@@ -191,12 +193,12 @@ class TestRules:
         )
 
         grid.nextgen()
-        assert grid[Point(2, 1)] == 0
-        assert grid[Point(2, 2)] == 0
+        assert grid[P(2, 1)] == 0
+        assert grid[P(2, 2)] == 0
 
     def test_rule_4(self):
         """Any dead cell with exactly three live neighbors becomees a live cell."""
         grid = Grid.from_2d_seq([[0, 0, 0], [0, 0, 1], [0, 1, 1]])
 
         grid.nextgen()
-        assert grid[Point(1, 1)] == 1
+        assert grid[P(1, 1)] == 1
