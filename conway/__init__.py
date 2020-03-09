@@ -22,7 +22,7 @@ def run(
     time.sleep(delay)
 
     while turns:
-        grid.nextgen()
+        grid.tick()
         render(grid, sep, out)
         time.sleep(delay)
         turns -= 1
@@ -33,7 +33,7 @@ def run_iter(
 ) -> Iterator[str]:
     yield draw(grid, sep)
     while turns:
-        grid.nextgen()
+        grid.tick()
         yield draw(grid, sep)
         turns -= 1
 

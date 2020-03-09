@@ -204,8 +204,13 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
             for x in range(self.width):
                 self[Point(x, y)] = random.random() < k
 
-    def nextgen(self):
-        """Update the Grid's cells by applying the Game of Life rules."""
+    def tick(self):
+        """Advance the Grid forward by one step.
+        
+        Generates a new generation of cells by applying the Game of Life
+        rules to each cell simultaneously, then updates the Grid with the
+        result.
+        """
         cells, next_cells = next(self.swap)
 
         for point, cell in self.enumerate_cells():

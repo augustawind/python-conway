@@ -8,14 +8,14 @@ class GameRulesTestMixin:
         """Any live cell with fewer than 2 live neighbors dies."""
         grid = self.GRID_CLS.from_2d_seq([[0, 0, 0], [0, 1, 1], [0, 0, 0]])
 
-        grid.nextgen()
+        grid.tick()
         assert len(grid) == 0
 
     def test_rule_2(self):
         """Any live cell with 2 or 3 neighbors lives on."""
         grid = self.GRID_CLS.from_2d_seq([[0, 1, 0], [0, 1, 1], [0, 0, 0]])
 
-        grid.nextgen()
+        grid.tick()
         assert grid[Point(1, 0)] == 1
         assert grid[Point(1, 1)] == 1
         assert grid[Point(2, 1)] == 1
@@ -26,7 +26,7 @@ class GameRulesTestMixin:
             [[0, 0, 0, 0], [0, 1, 1, 0], [0, 1, 1, 1], [0, 0, 0, 0]]
         )
 
-        grid.nextgen()
+        grid.tick()
         assert grid[Point(2, 1)] == 0
         assert grid[Point(2, 2)] == 0
 
@@ -34,5 +34,5 @@ class GameRulesTestMixin:
         """Any dead cell with exactly 3 live neighbors becomes alive."""
         grid = self.GRID_CLS.from_2d_seq([[0, 0, 0], [0, 0, 1], [0, 1, 1]])
 
-        grid.nextgen()
+        grid.tick()
         assert grid[Point(1, 1)] == 1
