@@ -119,7 +119,7 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
     @classmethod
     @abc.abstractmethod
     def from_set(cls, set_: Set[Point], **kwargs) -> "BaseGrid":
-        return NotImplemented
+        """Create a Grid from a Set of Points."""
 
     @classmethod
     def from_str(cls, s: str, char_alive: str = "*", **kwargs) -> "BaseGrid":

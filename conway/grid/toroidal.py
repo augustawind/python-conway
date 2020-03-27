@@ -83,14 +83,14 @@ class ToroidalArray(MutableSequence, Generic[T]):
     def _process_item(self, item: T) -> Union[T, "ToroidalArray[T]"]:
         """Prepare an item for insertion into the array.
 
-        This should be called by all of the insertion methods (append,
-        __setitem__, etc.) on all values coming in to get the correct value.
+        This is called by all of the insertion methods (append, __setitem__,
+        etc.) before insertion into the array.
         """
         if (
             self.recursive
             and self.recursion_depth
             and isinstance(item, CompositeIterable)
-            and type(item) is not ToroidalArray
+            and not isinstance(item, ToroidalArray)
         ):
             return ToroidalArray(
                 item, recursive=True, depth=self.recursion_depth - 1
