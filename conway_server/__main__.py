@@ -54,8 +54,9 @@ class Controller:
         self.paused = True
         self.playback = asyncio.Task(self.pause())
 
-    def send_grid(self):
-        return self.websocket.send(str(self.grid).replace("\n", CHR_LINE_SEP))
+    async def send_grid(self):
+        for line in str(self.grid).splitlines():
+            await self.websocket.send(line)
 
     async def dispatch(self, command: str, body: Optional[str] = None):
         if command == CMD_TOGGLE_PLAYBACK:
