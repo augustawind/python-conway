@@ -1,7 +1,7 @@
 import asyncio
 import re
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 
 import websockets
 
@@ -12,24 +12,26 @@ from conway.grid.cell_set import Grid
 
 We're using our own format here to keep it simple. The syntax is roughly:
 
-    message ::= command [ "<<<" body ]
+    message ::= command [ SP body ]
 
-where `command` is a typical identifier (letters/numbers/underscores/hyphens)
-and `body` is anything after the "<<<" delimiter.
+where `command` is a typical identifier (letters/numbers/underscores/hyphens),
+`SP` is one or more whitespace characters, and `body` is anything else.
 """
 RE_MSG = re.compile(
     r"""
     (?P<command>[A-Za-z][A-Za-z0-9_-]*)
     (?:
-        \s* <<<
-        \s* (?P<body> .*)
+        \s+ (?P<body> .*)
     )?
     """,
     re.VERBOSE,
 )
 
-MSG_CLIENT_ERR = "client-error <<< {}"
-MSG_SYNTAX_ERR = MSG_CLIENT_ERR.format("syntax error: could not parse message")
+MSG_CLIENT_ERR = "error: {}"
+MSG_SYNTAX_ERR = MSG_CLIENT_ERR.format(
+    "invalid syntax: could not parse message"
+)
+MSG_INVALID_CMD = MSG_CLIENT_ERR.format("invalid command `{}`")
 MSG_MISSING_VALUE = MSG_CLIENT_ERR.format("missing value for `{}`")
 
 CMD_NEW_GRID = "new-grid"
@@ -60,29 +62,17 @@ class Controller:
 
     async def dispatch(self, command: str, body: Optional[str] = None):
         if command == CMD_TOGGLE_PLAYBACK:
-            await self.toggle_playback()
+            await self.do_toggle_playback()
         elif command == CMD_SET_DELAY:
-            if body is None:
-                await self.websocket.send(
-                    MSG_MISSING_VALUE.format(CMD_SET_DELAY)
-                )
-            try:
-                delay = float(body)  # type: ignore
-            except TypeError:
-                await self.websocket.send(
-                    MSG_CLIENT_ERR.format(
-                        f"invalid value for `{CMD_SET_DELAY}`; expected"
-                        " a float in the range [0, 1)"
-                    )
-                )
-            await self.set_delay(delay)
+            await self.do_set_delay(body)
         elif command == CMD_RESTART:
-            await self.restart()
+            await self.do_restart()
         elif command == CMD_TICK:
-            n = body and int(body) or None
-            await self.tick(n)
+            await self.do_tick(body)
+        else:
+            await self.websocket.send(MSG_INVALID_CMD.format(command))
 
-    async def toggle_playback(self):
+    async def do_toggle_playback(self):
         self.playback.cancel()
 
         if self.paused:
@@ -101,14 +91,27 @@ class Controller:
         self.paused = True
         await self.send_grid()
 
-    async def set_delay(self, delay: float):
+    async def do_set_delay(self, delay: Any):
+        if delay is None:
+            return await self.websocket.send(
+                MSG_MISSING_VALUE.format(CMD_SET_DELAY)
+            )
+        try:
+            delay = float(delay)
+        except TypeError:
+            return await self.websocket.send(
+                MSG_CLIENT_ERR.format(
+                    f"invalid value for `{CMD_SET_DELAY}`; expected"
+                    " a float in the range [0, 1)"
+                )
+            )
         self.delay = delay
 
-    async def restart(self):
+    async def do_restart(self):
         pass
 
-    async def tick(self, n: Optional[int] = None):
-        for _ in range(n or 1):
+    async def do_tick(self, n: Any):
+        for _ in range(n and int(n) or 1):
             self.grid.tick()
         await self.send_grid()
 
