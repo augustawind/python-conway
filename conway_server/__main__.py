@@ -33,6 +33,9 @@ MSG_SYNTAX_ERR = MSG_CLIENT_ERR.format(
 )
 MSG_INVALID_CMD = MSG_CLIENT_ERR.format("invalid command `{}`")
 MSG_MISSING_VALUE = MSG_CLIENT_ERR.format("missing value for `{}`")
+MSG_INVALID_VALUE = MSG_CLIENT_ERR.format(
+    "invalid value for `{}`: expected {}"
+)
 
 CMD_NEW_GRID = "new-grid"
 CMD_TOGGLE_PLAYBACK = "toggle-playback"
@@ -59,6 +62,7 @@ class Controller:
     async def send_grid(self):
         for line in str(self.grid).splitlines():
             await self.websocket.send(line)
+        await self.websocket.send("\0")
 
     async def dispatch(self, command: str, body: Optional[str] = None):
         if command == CMD_TOGGLE_PLAYBACK:
@@ -98,11 +102,10 @@ class Controller:
             )
         try:
             delay = float(delay)
-        except TypeError:
+        except ValueError:
             return await self.websocket.send(
-                MSG_CLIENT_ERR.format(
-                    f"invalid value for `{CMD_SET_DELAY}`; expected"
-                    " a float in the range [0, 1)"
+                MSG_INVALID_VALUE.format(
+                    CMD_SET_DELAY, "a float in the range [0, 1)"
                 )
             )
         self.delay = delay
@@ -111,7 +114,15 @@ class Controller:
         pass
 
     async def do_tick(self, n: Any):
-        for _ in range(n and int(n) or 1):
+        try:
+            n = n and int(n) or 1
+        except ValueError:
+            pass
+        if not isinstance(n, int) or n < 1:
+            return await self.websocket.send(
+                MSG_INVALID_VALUE.format(CMD_TICK, "a positive integer")
+            )
+        for _ in range(n):
             self.grid.tick()
         await self.send_grid()
 
