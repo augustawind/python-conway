@@ -17,13 +17,15 @@ T = MutableSet[Point]
 class Grid(BaseGrid[T]):
     @classmethod
     def from_2d_seq(cls, seq: Sequence[Sequence[Any]], **kwargs) -> "Grid":
+        width = kwargs.get("width") or max(len(row) for row in seq)
+        height = kwargs.get("height") or len(seq)
         cells = {
             Point(x, y)
             for y, row in enumerate(seq)
             for x, cell in enumerate(row)
             if cell
         }
-        return Grid(cells=cells, **kwargs)
+        return Grid(width, height, cells=cells)
 
     @classmethod
     def from_set(cls, set_: Set[Point], **kwargs) -> "Grid":

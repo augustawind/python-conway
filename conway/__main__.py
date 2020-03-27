@@ -103,9 +103,6 @@ def main():
     )
     args = parser.parse_args()
 
-    # Expand separator to a full line.
-    args.separator *= grid.width // len(args.separator)
-
     # Randomly generate the grid.
     if args.random is not None:
         if not (args.width and args.height):
@@ -130,6 +127,9 @@ def main():
     elif args.file:
         pattern = args.file.read()
         grid = Grid.from_str(pattern, char_alive=args.char_alive)
+
+    # Expand separator to a full line.
+    args.separator *= grid.width // len(args.separator)
 
     # Run it!
     conway.run(
