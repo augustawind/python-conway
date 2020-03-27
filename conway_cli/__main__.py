@@ -173,19 +173,22 @@ def is_valid_command(text: str) -> bool:
     return bool(text) and (text.split(maxsplit=1)[0] in COMMANDS)
 
 
-def start_session(prefix: str = "> ", **session_kwargs) -> PromptSession:
+def get_completer(commands: Dict[str, Command]):
     completion_dict = {
         cmd.name: cmd.get_completions() for cmd in COMMANDS.values()
     }
+    return NestedCompleter(
+        {
+            name: WordCompleter(list(completions), meta_dict=completions)
+            for name, completions in completion_dict.items()
+        }
+    )
 
+
+def start_session(prefix: str = "> ", **session_kwargs) -> PromptSession:
     return PromptSession(
         prefix,
-        completer=NestedCompleter(
-            {
-                name: WordCompleter(list(completions), meta_dict=completions)
-                for name, completions in completion_dict.items()
-            }
-        ),
+        completer=get_completer(COMMANDS),
         complete_in_thread=True,
         complete_while_typing=True,
         validator=PTValidator.from_callable(
