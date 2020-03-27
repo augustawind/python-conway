@@ -40,7 +40,6 @@ MSG_INVALID_VALUE = MSG_CLIENT_ERR.format(
 CMD_NEW_GRID = "new-grid"
 CMD_TOGGLE_PLAYBACK = "toggle-playback"
 CMD_SET_DELAY = "set-delay"
-CMD_RESTART = "restart"
 CMD_TICK = "tick"
 
 CHR_LINE_SEP = "/"
@@ -69,8 +68,6 @@ class Controller:
             await self.do_toggle_playback()
         elif command == CMD_SET_DELAY:
             await self.do_set_delay(body)
-        elif command == CMD_RESTART:
-            await self.do_restart()
         elif command == CMD_TICK:
             await self.do_tick(body)
         else:
@@ -109,9 +106,6 @@ class Controller:
                 )
             )
         self.delay = delay
-
-    async def do_restart(self):
-        pass
 
     async def do_tick(self, n: Any):
         try:
