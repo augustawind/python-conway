@@ -201,6 +201,3 @@ class Grid(BaseGrid[ToroidalArray]):
         for y, row in enumerate(self.cells):
             for x, cell in enumerate(row):
                 yield Point(x, y), cell
-
-    def count_live_neighbors(self, point: Point) -> int:
-        return sum(self[point + delta] for delta in DIRS)

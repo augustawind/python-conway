@@ -11,25 +11,25 @@ from typing import (
 
 from conway.grid import DIRS, BaseGrid, Point
 
+T = MutableSet[Point]
 
-class Grid(BaseGrid[MutableSet[Point]]):
+
+class Grid(BaseGrid[T]):
     @classmethod
     def from_2d_seq(cls, seq: Sequence[Sequence[Any]], **kwargs) -> "Grid":
-        width = kwargs.get("width") or max(len(row) for row in seq)
-        height = kwargs.get("height") or len(seq)
         cells = {
             Point(x, y)
             for y, row in enumerate(seq)
             for x, cell in enumerate(row)
             if cell
         }
-        return Grid(width, height, cells=cells)
+        return Grid(cells=cells, **kwargs)
 
     @classmethod
     def from_set(cls, set_: Set[Point], **kwargs) -> "Grid":
         return Grid(cells=set(set_), **kwargs)
 
-    def mk_zeroed_cells(self) -> MutableSet[Point]:
+    def mk_zeroed_cells(self) -> T:
         return set()
 
     def calculate_size(self) -> Tuple[int, int]:
@@ -42,11 +42,11 @@ class Grid(BaseGrid[MutableSet[Point]]):
         return max_x, max_y
 
     @classmethod
-    def get_cell(cls, cells: MutableSet[Point], point: Point) -> bool:
+    def get_cell(cls, cells: T, point: Point) -> bool:
         return point in cells
 
     @classmethod
-    def set_cell(cls, cells: MutableSet[Point], point: Point, value: bool):
+    def set_cell(cls, cells: T, point: Point, value: bool):
         if value:
             cells.add(point)
         else:
@@ -57,6 +57,3 @@ class Grid(BaseGrid[MutableSet[Point]]):
             for x in range(self.width):
                 point = Point(x, y)
                 yield point, self[point]
-
-    def count_live_neighbors(self, point: Point) -> int:
-        return sum(point + delta in self.cells for delta in DIRS)

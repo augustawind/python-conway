@@ -178,9 +178,9 @@ class BaseGrid(Generic[T], Collection, metaclass=abc.ABCMeta):
         where `x` is the value of the cell at each Point.
         """
 
-    @abc.abstractmethod
     def count_live_neighbors(self, point: Point) -> int:
         """Return the number of live neighbors adjacent to the given Point."""
+        return sum(self[point + delta] for delta in DIRS)
 
     def __getitem__(self, point: Point) -> bool:
         return self.get_cell(self.cells, point)
